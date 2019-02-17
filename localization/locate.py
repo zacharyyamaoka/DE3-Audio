@@ -7,6 +7,7 @@ class SoundLocalizer():
     def locate(self, re, le):
 
         radius =  1
+        theta = 0
         r_total = np.sum(re)
         l_total = np.sum(le)
 
@@ -15,5 +16,5 @@ class SoundLocalizer():
 
         if r_total<l_total:
             theta = np.deg2rad(180)
-            
+
         return radius, theta
