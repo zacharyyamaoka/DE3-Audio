@@ -1,5 +1,7 @@
+
 from locate import SoundLocalizer
 from filter import PositionFilter
+
 # Audio Localization Algorithm
 
 Localizer = SoundLocalizer()
