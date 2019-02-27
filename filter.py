@@ -17,8 +17,8 @@ class PositionFilter():
 
         self.r_a[self.pointer] = last_r
         self.theta_a[self.pointer] = last_theta
-        print(self.r_a)
-        print(self.theta_a)
+        #print(self.r_a)
+        #print(self.theta_a)
         self.pointer += 1
         self.pointer = self.pointer % self.size #add wrap around
 
