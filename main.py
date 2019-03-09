@@ -1,6 +1,7 @@
 from ALA import ala
 from Audio import *
 from debugger import *
+import time
 
 room_width = 5
 room_length = 5
@@ -22,6 +23,9 @@ while True:
     counter += 1
 
     le, re = player.stream_audio()
+    print(len(le))
+    #print(len(re))
+    #time.sleep(1)
     r, theta = ala(le, re)
 
     if counter % 20 == 0:

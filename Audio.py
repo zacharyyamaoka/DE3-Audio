@@ -11,7 +11,7 @@ class AudioPlayer():
     def __init__(self):
         # self.p = pyaudio.PyAudio()
         self.CHUNKSIZE = 1024
-        print(0)
+        #print(0)
 
     def load_wav_audio(self, file):
         wf = wave.open(file, 'rb')
