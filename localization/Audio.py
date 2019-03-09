@@ -23,6 +23,13 @@ class AudioPlayer():
 
         self.wf = wf
 
+    def play(self):
+        data = self.wf.readframes(self.CHUNKSIZE)
+        while data != '':
+
+            self.stream.write(data)
+            data = self.wf.readframes(self.CHUNKSIZE)
+
     def stream_audio(self, live=False):
         if live:
             pass
@@ -33,7 +40,6 @@ class AudioPlayer():
                 # viz(sound_array)
                 self.stream.write(data)
                 data = self.wf.readframes(self.CHUNKSIZE)
-
             else:
                 self.stream.stop_stream()
                 self.stream.close()
