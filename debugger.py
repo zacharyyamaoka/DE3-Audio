@@ -14,7 +14,7 @@ ax1 = fig1.add_subplot(111, aspect='equal')
 
 def viz(sound):
     channels = sound.shape[1]
-
+    print("DRAWING")
     l_ax.clear()
     r_ax.clear()
 
