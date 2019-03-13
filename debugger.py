@@ -3,14 +3,14 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches
 
 
-plt.ion()
-plt.show()
+#plt.ion()
+#plt.show()
 # fig2 = plt.figure(2)
 # l_ax = fig2.add_subplot(211)
 # r_ax = fig2.add_subplot(212)
 
-fig1 = plt.figure(1)
-ax1 = fig1.add_subplot(111, aspect='equal')
+#fig1 = plt.figure(1)
+#ax1 = fig1.add_subplot(111, aspect='equal')
 
 def viz(sound):
     channels = sound.shape[1]

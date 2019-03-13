@@ -85,8 +85,8 @@ def sample2labelId(n, sample_rate,label_rate): #get label which correlates with 
 
 def show_data(data, labels):
     pass
-
-data = load_data_file(1,show=True)
+'''
+data = load_data_file(0,show=False)
 print("Data Params")
 print("Audio Stero Vector: ", data[0].shape, " Sample Rate: ", data[2][0])
 print("Position Label: ", data[1].shape, " Label Rate: ", data[2][1])
@@ -96,3 +96,4 @@ ind = sample2labelId(0, 44100, 1) #will be some small error, but no more then 1 
 print(ind)
 ind = sample2labelId(data[0].shape[0], 44100, 1) #will be some small error, but no more then 1 label so its ok....
 print(ind)
+'''
