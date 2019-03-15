@@ -1,0 +1,82 @@
+import pyaudio
+import numpy as np
+
+import pyaudio
+import wave
+
+from debugger import *
+from audio_utils import *
+
+class AudioPlayer():
+    def __init__(self, chunk = 1024):
+        # self.p = pyaudio.PyAudio()
+        self.CHUNKSIZE = chunk
+        p = pyaudio.PyAudio()
+        self.FORMAT = pyaudio.paInt16
+        self.CHANNELS = 2
+        self.RATE = 44100
+
+        self.stream_out = p.open(format=self.FORMAT,
+                channels=self.CHANNELS ,
+                rate=self.RATE,
+                output=True)
+
+        self.stream_in = p.open(format=self.FORMAT,
+                        channels=self.CHANNELS ,
+                        rate=self.RATE,
+                        input=True,
+                        frames_per_buffer=self.CHUNKSIZE)
+
+    def load_wav_audio(self, file):
+        wf = wave.open(file, 'rb')
+        self.wf = wf
+        self.num_samples = wf.getnframes()
+
+    # def start_live_rec(self, chunksize = 1024):
+
+    def play_this(self, song):
+        self.stream_out.write(song)
+
+    def play(self):
+        data = self.wf.readframes(self.CHUNKSIZE)
+        while data != '':
+
+            self.stream_out.write(data)
+            data = self.wf.readframes(self.CHUNKSIZE)
+
+    def get_all_data(self):
+        data = self.wf.readframes(self.num_samples)
+        sound_array = decode(data,2)
+        return sound_array
+
+    def get_live_audio(self):
+        data = self.stream_in.read(self.CHUNKSIZE)
+        return data
+
+    def stream_audio(self, live=False, playback=False, get_data=False, use_viz=False):
+        if live:
+            data = self.get_live_audio()
+        else: #play back pre recorded
+            data = self.wf.readframes(self.CHUNKSIZE)
+
+        if data != '':
+            sound_array = decode(data,2)
+        else:
+            self.stream_out.stop_stream()
+            self.stream_out.close()
+
+        if use_viz:
+            viz(sound_array)
+        if get_data:
+            pass
+        if playback:
+            self.stream_out.write(data)
+
+        # le, re = sound_array[:,0], sound_array[:,1]
+        return sound_array
+
+#how am I going to deal with nan's in the audio signal....
+#real time aspect complicate things greatly, the fact that it is real audio
+
+def normalize(data):
+    pass
