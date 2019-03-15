@@ -1,15 +1,14 @@
 import pandas as pd
 import numpy as np
 import glob
-import matplotlib.pyplot as plt
-import sys
-import os
-sys.path.append(os.path.join(os.getcwd(), "utils"))
 
 import torch
 import torch.nn.functional as F
 from torch.utils.data import Dataset
 
+import os
+import sys
+sys.path.append(os.path.join(os.getcwd(), "utils"))
 from data_utils import *
 
 class AudioLocationDataset(Dataset):
@@ -67,11 +66,11 @@ class AudioLocationNN(torch.nn.Module):
         self.conv1 = torch.nn.Conv1d(2, 2, kernel_size=4, stride=2, padding=1)
         self.conv2 = torch.nn.Conv1d(2, 2, kernel_size=4, stride=2, padding=1)
         self.conv3 = torch.nn.Conv1d(2, 2, kernel_size=4, stride=2, padding=1)
-        self.dense1 = torch.nn.Linear(100, 2)
+        self.dense1 = torch.nn.Linear(1024, 2)
     def forward(self, x):
         x = F.relu(self.conv1(x))
         x = F.relu(self.conv2(x))
-        x = F.relu(self.conv3(x)).view(-1, 100)
+        x = F.relu(self.conv3(x)).view(-1, 1024)
         x = self.dense1(x)
         return x
 
@@ -85,8 +84,8 @@ train_samples = torch.utils.data.DataLoader(dataset=data,
                                               shuffle=True)
 
 sample_rate = 44100 #hertz
-label_rate = 100 #hertz
-chunk_size = 400 #number of samples to feed to model
+label_rate = 1 #hertz
+chunk_size = 4096 #number of samples to feed to model
 
 lr = 0.001 #learning rate
 epochs = 10 #number of epochs
@@ -101,8 +100,7 @@ def train(epochs):
     #for plotting cost per batch
     costs = []
     plt.ion()
-
-    fig = plt.figure()
+    fig = plt.figure(figsize=(10, 5))
     ax = fig.add_subplot(121)
     ax1 = fig.add_subplot(122)
     plt.show()
@@ -144,8 +142,9 @@ def train(epochs):
                 ax1.set_ylim(-5, 5)
 
                 fig.canvas.draw()
-                plt.show()
+                plt.pause(0.001)
                 print('Epoch', e, '\tAudioclip', i, '\tSample', j, '\tCost', cost.item())
+
 
 
 train(epochs)

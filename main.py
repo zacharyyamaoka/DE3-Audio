@@ -21,6 +21,8 @@ counter = 0
 #source activate tensorflow
 # player.load_wav_audio("data_wav/data_rec001.wav")
 
+
+#Normal Audio Signal to go between 1 and 0? so all db the same... or is it a matter or fine tunning, live calibrating.....
 while True:
     counter += 1
     audio_vec = Player.stream_audio(live = True, playback=True)

@@ -47,15 +47,31 @@ class RandomPolarWalker():
         self.min_r = 0.20 # no closer then 20cm
         self.max_r = 4 # no furthher than 4m
 
+        self.timer = 0
+        self.accel = 0.5
+
     def update(self, dt=0.1):
 
         #update speed and orientation
+        self.timer += dt
+
         self.r_dot += dt * np.random.normal(0,self.acc_std)
         self.theta_dot += dt * np.random.normal(0,self.acc_std) #in small steps....
 
         #Move person
         self.r += self.r_dot * dt
         self.theta += self.theta_dot * dt
+
+        # with small probabality switch direction
+        if self.timer > 3: # every one second you may switchh
+
+            self.timer = 0
+
+            #with small probability stop, mabye also fixes this unbounded increase problem
+            if np.random.random() > 0.8:
+                self.theta_dot = 0
+            if np.random.random() > 0.8:
+                self.r_dot = 0
 
         self.check_bounds()
         """Move the Random walker in space"""

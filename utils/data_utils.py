@@ -27,11 +27,11 @@ def get_zero_string(n):
     return zero_str
 
 
-def load_data_file(n=1,audio_n_offset=1,file_stem="data_rec",sample_rate = 44100,label_rate = 1): #only works up to 10 rn
+def load_data_file(n=1,audio_n_offset=0,file_stem="data_rec",sample_rate = 44100,label_rate = 1): #only works up to 10 rn
     #========================================
     #SET CORRECT PATHS
     data_label_path = "/Users/zachyamaoka/Documents/de3_audio/data_label" + "/"
-    data_wav_path = "/Users/zachyamaoka/Dropbox/de3_audio_data/data_wav_4" + "/"
+    data_wav_path = "/Users/zachyamaoka/Dropbox/de3_audio_data/data_wav_5" + "/"
 
 
     #========================================
@@ -124,17 +124,17 @@ def sample2labelId(n, sample_rate,label_rate): #get label which correlates with 
 def show_data(data, labels):
     pass
 
-#
-# if __name__ == '__main__':
-#     data = load_data_file(n=1,label_rate = 100)
-#     listen_2_data(data)
-#     print("Data Params")
-#     print("Audio Stero Vector: ", data[0].shape, " Sample Rate: ", data[2][0])
-#     print("Position Label: ", data[1].shape, " Label Rate: ", data[2][1])
-#     '''
-#     ind = sample2labelId(0, 44100, 1) #will be some small error, but no more then 1 label so its ok....
-#     # assert ind == 0
-#     print(ind)
-#     ind = sample2labelId(data[0].shape[0], 44100, 1) #will be some small error, but no more then 1 label so its ok....
-#     print(ind)
-#     '''
+
+if __name__ == '__main__':
+    data = load_data_file(n=1,label_rate = 100)
+    listen_2_data(data)
+    print("Data Params")
+    print("Audio Stero Vector: ", data[0].shape, " Sample Rate: ", data[2][0])
+    print("Position Label: ", data[1].shape, " Label Rate: ", data[2][1])
+    '''
+    ind = sample2labelId(0, 44100, 1) #will be some small error, but no more then 1 label so its ok....
+    # assert ind == 0
+    print(ind)
+    ind = sample2labelId(data[0].shape[0], 44100, 1) #will be some small error, but no more then 1 label so its ok....
+    print(ind)
+    '''
