@@ -11,7 +11,7 @@ Controller = TuneInControl(port=12300)
 Walker = RandomPolarWalker()
 
 #MAKE SURE TO CHANGE THE FILE NUMBER
-File = LabelFile(2)
+File = LabelFile(6)
 
 last_time = time.time()
 
