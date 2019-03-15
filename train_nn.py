@@ -1,6 +1,10 @@
 import pandas as pd
 import numpy as np
 import glob
+import matplotlib.pyplot as plt
+import sys
+import os
+sys.path.append(os.path.join(os.getcwd(), "utils"))
 
 import torch
 import torch.nn.functional as F
@@ -47,7 +51,7 @@ def toCartesian(rhophi):
     x = rho * np.cos(phi)
     y = rho * np.sin(phi)
     return(x, y)
-    
+
 
 class ToTensor():
     def __init__(self):
@@ -63,11 +67,11 @@ class AudioLocationNN(torch.nn.Module):
         self.conv1 = torch.nn.Conv1d(2, 2, kernel_size=4, stride=2, padding=1)
         self.conv2 = torch.nn.Conv1d(2, 2, kernel_size=4, stride=2, padding=1)
         self.conv3 = torch.nn.Conv1d(2, 2, kernel_size=4, stride=2, padding=1)
-        self.dense1 = torch.nn.Linear(1024, 2)
+        self.dense1 = torch.nn.Linear(100, 2)
     def forward(self, x):
         x = F.relu(self.conv1(x))
         x = F.relu(self.conv2(x))
-        x = F.relu(self.conv3(x)).view(-1, 1024)
+        x = F.relu(self.conv3(x)).view(-1, 100)
         x = self.dense1(x)
         return x
 
@@ -81,8 +85,8 @@ train_samples = torch.utils.data.DataLoader(dataset=data,
                                               shuffle=True)
 
 sample_rate = 44100 #hertz
-label_rate = 1 #hertz
-chunk_size = 4096 #number of samples to feed to model
+label_rate = 100 #hertz
+chunk_size = 400 #number of samples to feed to model
 
 lr = 0.001 #learning rate
 epochs = 10 #number of epochs
@@ -97,7 +101,8 @@ def train(epochs):
     #for plotting cost per batch
     costs = []
     plt.ion()
-    fig = plt.figure(figsize=(10, 5))
+
+    fig = plt.figure()
     ax = fig.add_subplot(121)
     ax1 = fig.add_subplot(122)
     plt.show()
@@ -106,7 +111,7 @@ def train(epochs):
 
     ax1.set_xlabel('x')
     ax1.set_ylabel('y')
-    
+
     for e in range(epochs):
         for i, (xb, yb) in enumerate(train_samples):
             #xb, yb = torch.squeeze(xb), torch.squeeze(yb)
@@ -117,9 +122,9 @@ def train(epochs):
 
                 h = model.forward(x) #calculate hypothesis
                 print('Pred', h.detach().numpy(), 'Label', y.detach().numpy())
-    
+
                 cost = F.mse_loss(h, y) #calculate cost
-                
+
                 optimizer.zero_grad() #zero gradients
                 cost.backward() # calculate derivatives of values of filters
                 optimizer.step() #update parameters
@@ -139,7 +144,7 @@ def train(epochs):
                 ax1.set_ylim(-5, 5)
 
                 fig.canvas.draw()
-
+                plt.show()
                 print('Epoch', e, '\tAudioclip', i, '\tSample', j, '\tCost', cost.item())
 
 
