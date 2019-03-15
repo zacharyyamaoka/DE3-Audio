@@ -5,13 +5,12 @@ import pyaudio
 import wave
 
 from debugger import *
-
+from audio_utils import *
 
 class AudioPlayer():
-    def __init__(self):
+    def __init__(self, chunk = 1024):
         # self.p = pyaudio.PyAudio()
-        self.CHUNKSIZE = 1024
-        #print(0)
+        self.CHUNKSIZE = chunk
 
     def load_wav_audio(self, file):
         wf = wave.open(file, 'rb')
@@ -22,6 +21,9 @@ class AudioPlayer():
                 output=True)
 
         self.wf = wf
+        self.num_samples = wf.getnframes()
+    def play_this(self, song):
+        self.stream.write(song)
 
     def play(self):
         data = self.wf.readframes(self.CHUNKSIZE)
@@ -30,16 +32,23 @@ class AudioPlayer():
             self.stream.write(data)
             data = self.wf.readframes(self.CHUNKSIZE)
 
-    def stream_audio(self, live=False):
+    def get_all_data(self):
+        data = self.wf.readframes(self.num_samples)
+        sound_array = decode(data,2)
+        return sound_array
+
+
+    def stream_audio(self, live=False, get_data=False, use_viz=False):
         if live:
             pass
         else: #play back pre recorded
             data = self.wf.readframes(self.CHUNKSIZE)
             if data != '':
                 sound_array = decode(data,2)
-                # viz(sound_array)
                 self.stream.write(data)
-                data = self.wf.readframes(self.CHUNKSIZE)
+                # if use_viz:
+                #     viz(sound_array)
+                # if get_data:
             else:
                 self.stream.stop_stream()
                 self.stream.close()
@@ -52,34 +61,3 @@ class AudioPlayer():
 
 def normalize(data):
     pass
-# Code taken from https://stackoverflow.com/questions/22636499/convert-multi-channel-pyaudio-into-numpy-array
-def decode(in_data, channels):
-    """
-    Convert a byte stream into a 2D numpy array with
-    shape (chunk_size, channels)
-
-    Samples are interleaved, so for a stereo stream with left channel
-    of [L0, L1, L2, ...] and right channel of [R0, R1, R2, ...], the output
-    is ordered as [L0, R0, L1, R1, ...]
-    """
-    # TODO: handle data type as parameter, convert between pyaudio/numpy types
-    result = np.fromstring(in_data, dtype='Int16')
-
-    chunk_length = len(result) / channels
-    assert chunk_length == int(chunk_length)
-
-    result = np.reshape(result, (int(chunk_length), int(channels)))
-    return result
-
-
-def encode(signal):
-    """
-    Convert a 2D numpy array into a byte stream for PyAudio
-
-    Signal should be a numpy array with shape (chunk_size, channels)
-    """
-    interleaved = signal.flatten()
-
-    # TODO: handle data type as parameter, convert between pyaudio/numpy types
-    out_data = interleaved.astype('Int16').tostring()
-    return out_data
