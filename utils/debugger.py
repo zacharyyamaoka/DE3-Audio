@@ -35,12 +35,24 @@ class Debugger():
         circle= plt.Circle((0,0), radius= 0.2) #20 cm
         self.ax1.add_patch(circle)
 
+    def draw_heading(self, theta):
+
+        theta = theta % (2 * np.pi)
+        self.ax1.clear()
+        self.draw_head()
+        self.ax1.set_ylim(-self.w/2,self.w/2)
+        self.ax1.set_xlim(-self.w/2,self.w/2)
+        plt.quiver(0, 0, 3*np.cos(theta), 3*np.sin(theta), angles='xy',  scale_units='xy', scale=1)
+        plt.show()
+        plt.pause(0.000001)
+
     def draw_sound_in_room(self, x, y):
         # head = plt.Circle((0, 0), 0.2, color='r')
 
         #rotate so head is facing forward
-        x = -y
-        y = x
+        # x = -y
+        # y = x
+        # not needed on current viz set up
         self.ax1.clear()
         self.draw_head()
         self.ax1.plot(x,y,'ro')
@@ -56,4 +68,4 @@ class Debugger():
         # room = patches.Rectangle((-w/2,-l/2),w,l,linewidth=1,fill=False)
         # ax.add_patch(room)
         plt.show()
-        plt.pause(0.0001)
+        # plt.pause(0.0001)

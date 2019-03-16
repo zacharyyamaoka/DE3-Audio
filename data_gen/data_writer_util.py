@@ -27,6 +27,12 @@ class LabelFile():
 
         line = str(x) + " " + str(y) + " " + str(z)
         self.file.write(line + "\n")
+    def write_heading(self,theta):
+        prec = 3
+        theta = np.round(theta,prec)
+
+        line = str(theta)
+        self.file.write(line + "\n")
 
     def close(self):
         self.file.close()

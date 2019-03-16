@@ -11,22 +11,23 @@ class AudioPlayer():
     def __init__(self, chunk = 1024):
         # self.p = pyaudio.PyAudio()
         self.CHUNKSIZE = chunk
-        p = pyaudio.PyAudio()
+        self.p = pyaudio.PyAudio()
         self.FORMAT = pyaudio.paInt16
         self.CHANNELS = 2
         self.RATE = 44100
 
-        self.stream_out = p.open(format=self.FORMAT,
+        self.stream_out = self.p.open(format=self.FORMAT,
                 channels=self.CHANNELS ,
                 rate=self.RATE,
                 output=True)
 
-        self.stream_in = p.open(format=self.FORMAT,
+        self.stream_in = self.p.open(format=self.FORMAT,
                         channels=self.CHANNELS ,
                         rate=self.RATE,
                         input=True,
                         frames_per_buffer=self.CHUNKSIZE)
 
+        self.frames =[]
     def load_wav_audio(self, file):
         wf = wave.open(file, 'rb')
         self.wf = wf
@@ -74,6 +75,24 @@ class AudioPlayer():
 
         # le, re = sound_array[:,0], sound_array[:,1]
         return sound_array
+
+    def record(self, chunk=1024, playback=False):
+        data = self.stream_in.read(chunk)
+        if playback:
+            self.stream_out.write(data)
+        self.frames.append(data)
+
+    def save_rec(self, name = "test_live_rec.wav"):
+
+        self.stream_in.stop_stream()
+        self.stream_in.close()
+        self.p.terminate()
+        wf = wave.open(name, 'wb')
+        wf.setnchannels(self.CHANNELS)
+        wf.setsampwidth(self.p.get_sample_size(self.FORMAT))
+        wf.setframerate(self.RATE)
+        wf.writeframes(b''.join(self.frames))
+        wf.close()
 
 #how am I going to deal with nan's in the audio signal....
 #real time aspect complicate things greatly, the fact that it is real audio

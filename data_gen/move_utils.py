@@ -48,8 +48,19 @@ class RandomPolarWalker():
         self.max_r = 4 # no furthher than 4m
 
         self.timer = 0
+        self.slow_timer = 0
         self.accel = 0.5
+        self.slow_speed = 0.5
+        #
+        if np.random.random() > 0.5:
+            self.slow_speed *= 1
+    def slow_update(self, dt=0.1): # this walker just goes around in circles at a more consitent and slow Rate
+        self.slow_timer += dt
 
+        self.r = 3# keep it constant....
+        self.theta += self.slow_speed * dt
+        self.theta = self.theta % (2 * np.pi)
+        # print(np.rad2deg(self.theta))
     def update(self, dt=0.1):
 
         #update speed and orientation
@@ -76,6 +87,11 @@ class RandomPolarWalker():
         self.check_bounds()
         """Move the Random walker in space"""
 
+    def heading(self):
+
+        # map_theta = (self.theta + np.pi) % (2 * np.pi ) - np.pi
+        # print(np.rad2deg(map_theta))
+        return self.theta
     def location(self):
 
         x = self.r*np.cos(self.theta)
@@ -83,6 +99,7 @@ class RandomPolarWalker():
         z = self.z
 
         return x, y, z
+
 
     def check_bounds(self):
         """Make sure walker stays within room"""
