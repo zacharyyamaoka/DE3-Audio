@@ -10,10 +10,10 @@ from data_utils import get_zero_string
 
 class LabelFile():
 
-    def __init__(self,num):
+    def __init__(self,num,stem="data_rec_",path="/Users/zachyamaoka/Documents/de3_audio/data_real_label/"):
 
-      self.PATH = "/Users/zachyamaoka/Documents/de3_audio/data_label/"
-      self.file_stem = "data_rec"
+      self.PATH = path
+      self.file_stem = stem
       num = get_zero_string(num)
       file_path =   self.PATH + self.file_stem + num + '.txt'
       self.file = open(file_path,"w+")

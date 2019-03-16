@@ -54,6 +54,11 @@ class AudioPlayer():
         data = self.stream_in.read(self.CHUNKSIZE)
         return data
 
+    def get_live_chunk(self, chunk=1024): # for running on API
+        self.stream_in.start_stream()
+        data = self.stream_in.read(chunk)
+        self.stream_in.stop_stream() #pause so you don't over flow
+
     def stream_audio(self, live=False, playback=False, get_data=False, use_viz=False):
         if live:
             data = self.get_live_audio()
@@ -76,10 +81,13 @@ class AudioPlayer():
         # le, re = sound_array[:,0], sound_array[:,1]
         return sound_array
 
-    def record(self, chunk=1024, playback=False):
+    def record(self, chunk=2**12, playback=False):
+        print("rec time: ", chunk/44100)
+        # self.stream_in.start_stream()
         data = self.stream_in.read(chunk)
         if playback:
             self.stream_out.write(data)
+        # self.stream_in.stop_stream() #pause so you don't over flow
         self.frames.append(data)
 
     def save_rec(self, name = "test_live_rec.wav"):

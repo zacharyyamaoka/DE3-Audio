@@ -35,7 +35,13 @@ class Debugger():
         circle= plt.Circle((0,0), radius= 0.2) #20 cm
         self.ax1.add_patch(circle)
 
-    def draw_heading(self, theta):
+    def write(self,val='test'):
+        self.ax1.text(0, 0, val,
+        horizontalalignment='center',
+        verticalalignment='center',
+        fontsize=100, color='red')
+
+    def draw_heading(self, theta, show = True):
 
         theta = theta % (2 * np.pi)
         self.ax1.clear()
@@ -43,8 +49,9 @@ class Debugger():
         self.ax1.set_ylim(-self.w/2,self.w/2)
         self.ax1.set_xlim(-self.w/2,self.w/2)
         plt.quiver(0, 0, 3*np.cos(theta), 3*np.sin(theta), angles='xy',  scale_units='xy', scale=1)
-        plt.show()
-        plt.pause(0.000001)
+        if show:
+            plt.show()
+            plt.pause(0.0001)
 
     def draw_sound_in_room(self, x, y):
         # head = plt.Circle((0, 0), 0.2, color='r')

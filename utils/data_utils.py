@@ -69,6 +69,9 @@ def load_data_file(n=1,audio_n_offset=0,file_stem="data_rec",sample_rate = 44100
     num_sample_labeled = label_time * sample_rate
     end = int(start + num_sample_labeled)
     data = data[start:end,:]
+
+    len_data = data.shape[0]
+    print("Song time: ", len_data/sample_rate)
     #find end based on num of samples
 
     return [data,label,[sample_rate,label_rate]] #list of data
@@ -126,11 +129,19 @@ def show_data(data, labels):
 
 
 if __name__ == '__main__':
+<<<<<<< HEAD
     data = load_data_file(n=1,label_rate = 100)
     listen_2_data(data)
     #print("Data Params")
     #print("Audio Stero Vector: ", data[0].shape, " Sample Rate: ", data[2][0])
     #print("Position Label: ", data[1].shape, " Label Rate: ", data[2][1])
+=======
+    data = load_data_file(n=6,label_rate = 100)
+    # listen_2_data(data)
+    print("Data Params")
+    print("Audio Stero Vector: ", data[0].shape, " Sample Rate: ", data[2][0])
+    print("Position Label: ", data[1].shape, " Label Rate: ", data[2][1])
+>>>>>>> 8ba5c2dd3e165c94f5b582fb98c03df5610a7cc6
     '''
     ind = sample2labelId(0, 44100, 1) #will be some small error, but no more then 1 label so its ok....
     # assert ind == 0
