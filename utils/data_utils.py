@@ -27,14 +27,9 @@ def get_zero_string(n):
     return zero_str
 
 
-def load_data_file(n=1,audio_n_offset=0,file_stem="data_rec",sample_rate = 44100,label_rate = 1): #only works up to 10 rn
-    #========================================
-    #SET CORRECT PATHS
-    data_label_path = "/Users/zachyamaoka/Documents/de3_audio/data_label" + "/"
-    data_wav_path = "/Users/zachyamaoka/Dropbox/de3_audio_data/data_wav_5" + "/"
-
-
-    #========================================
+def load_data_file(n=1,audio_n_offset=0,file_stem="data_rec",sample_rate = 44100,label_rate = 1,
+data_label_path="/Users/zachyamaoka/Documents/de3_audio/data_label/",
+data_wav_path="/Users/zachyamaoka/Dropbox/de3_audio_data/data_wav_5/"): #only works up to 10 rn
 
     label_num = get_zero_string(n)
     audio_num = get_zero_string(n+audio_n_offset)
@@ -45,6 +40,8 @@ def load_data_file(n=1,audio_n_offset=0,file_stem="data_rec",sample_rate = 44100
     #First load labels from the audio file
     label = np.loadtxt(label_file_path)
     num_labels = label.shape[0]
+    # if len(label.shape) < 2: #theta
+    # label.reshape(num_labels,1)
 
     #load audio file
     chunk = 1024
@@ -53,7 +50,10 @@ def load_data_file(n=1,audio_n_offset=0,file_stem="data_rec",sample_rate = 44100
     raw_data = player.get_all_data()
 
     #regardless clip of first 2 seconds if data #b/c small not meaningful start at the begging
-    start_clip = sample_rate * 2 #seconds
+    if label_rate == 100: #old recs
+        start_clip = sample_rate * 2 #seconds
+    else:
+        start_clip = 0
     data = raw_data[start_clip:-1]
     num_sample = data.shape[0]
 
@@ -79,6 +79,9 @@ def load_data_file(n=1,audio_n_offset=0,file_stem="data_rec",sample_rate = 44100
 def listen_2_data(all_data, window_chunk=1024, audio_rate=44100, label_rate=100):
     data = all_data[0]
     label = all_data[1]
+    if len(label.shape) == 1: #just theta
+        label = label.reshape(label.shape[0],1)
+
     curr_frame = 0
     last_frame = data.shape[0] - 1
     last_ind = -1
@@ -98,21 +101,25 @@ def listen_2_data(all_data, window_chunk=1024, audio_rate=44100, label_rate=100)
         if curr_frame > last_frame:
             break
 
-        ind = sample2labelId(curr_frame,44100,label_rate)
+        ind = sample2labelId(curr_frame,audio_rate,label_rate)
 
         count += 1
-
         if count % 50 == 0:
         # if ind != last_ind: #only go further if he has moved, may get lag if label rate 2 high
             last_ind = ind
+            print("ind", ind)
+            print(label.shape)
             pos = label[ind,:]
-            r = np.sqrt(pos[0]**2 + pos[1]**2)
-            theta = np.cos(pos[0]/r)
-            print(r, theta)
-            Viz.draw_sound_in_room(pos[0], pos[1])
+            if len(pos) == 3: #xyz
+                r = np.sqrt(pos[0]**2 + pos[1]**2)
+                theta = np.cos(pos[0]/r)
+                print(r, theta)
+                Viz.draw_sound_in_room(pos[0], pos[1])
+            else: #theta
+                Viz.draw_heading(pos[0])
+
 
         player.play_this(parsed_audio)
-
 
 def sample2labelId(n, sample_rate,label_rate): #get label which correlates with sample
     timestamp = n/sample_rate
@@ -129,8 +136,11 @@ def show_data(data, labels):
 
 
 if __name__ == '__main__':
-    data = load_data_file(n=6,label_rate = 100)
-    # listen_2_data(data)
+    data = load_data_file(n=0,label_rate = 10,file_stem="real_rec_",
+    data_label_path="/Users/zachyamaoka/Documents/de3_audio/data_real_label/",
+    data_wav_path="/Users/zachyamaoka/Dropbox/de3_audio_data/data_real_wav/")
+
+    listen_2_data(data,label_rate = 10)
     print("Data Params")
     print("Audio Stero Vector: ", data[0].shape, " Sample Rate: ", data[2][0])
     print("Position Label: ", data[1].shape, " Label Rate: ", data[2][1])

@@ -67,7 +67,7 @@ last_time = time.time()
 
 ##############################
 """IMPORTANT"""
-rec_time = 1 * 60
+rec_time = 5 * 60
 # rec_time = 5
 label_freq = 10
 ##############################
