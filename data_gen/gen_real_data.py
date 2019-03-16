@@ -40,17 +40,16 @@ while time_running < rec_time:
 
     Player.record(playback=True)
 
+
     Walker.slow_update(dt) #pick dt so it matcehs the chunck size.... or is it the dt of the loop?
     theta = Walker.heading()
-    #
-    
-    #
+    Viz.draw_heading(theta)
+    print(dt)
     if label_time >= label_period: #rate at which I write is indepent and will slightly vary.....
         # print(label_time)
         # print(label_time)
-        print(label_time)
+        # print(label_time)
         label_time = 0 #start counting agian
-        Viz.draw_heading(theta)
         File.write_heading(theta)
     #
     # #wait util loop time is
