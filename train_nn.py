@@ -26,11 +26,11 @@ class AudioLocationDataset(Dataset):
         audio, label, rates = load_data_file(n=idx)
         audio = audio.T
         label = label[:, :2]
-        print(label)
+        #print(rates)
         #for i in range(len(label)):
             #label[i] = toPolar(label[i])
         label = np.apply_along_axis(toPolar, 1, label)
-        print(label)
+        #print(label)
 
         if self.transform:
             audio, label = self.transform((audio, label))
@@ -84,7 +84,7 @@ train_samples = torch.utils.data.DataLoader(dataset=data,
                                               shuffle=True)
 
 sample_rate = 44100 #hertz
-label_rate = 1 #hertz
+label_rate = 100 #hertz
 chunk_size = 4096 #number of samples to feed to model
 
 lr = 0.001 #learning rate
@@ -113,7 +113,8 @@ def train(epochs):
     for e in range(epochs):
         for i, (xb, yb) in enumerate(train_samples):
             #xb, yb = torch.squeeze(xb), torch.squeeze(yb)
-            #print(xb.shape, yb.shape)
+            print('Audio shape', xb.shape, 'Label shape', yb.shape)
+            gg
             for j in range(yb.shape[1]):
                 start_ind = np.random.randint(j * sample_rate//label_rate, ((j+1) * sample_rate//label_rate)- chunk_size)
                 x, y = xb[0, :, start_ind:start_ind+chunk_size].unsqueeze(dim=0), yb[0, j].unsqueeze(dim=0)
