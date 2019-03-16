@@ -8,6 +8,7 @@ from debugger import Debugger
 import os
 import sys
 sys.path.append(os.path.join(os.getcwd(), "utils"))
+from data_utils import get_zero_string
 from Audio import AudioPlayer
 
 Walker = RandomPolarWalker()
@@ -58,7 +59,9 @@ while time_running < rec_time:
     # # time.sleep(0.001) #essentiall I want the movment to be as smooth as possible, but within reason OSC has limited commication rate....
 
 
+
 path = "/Users/zachyamaoka/Dropbox/de3_audio_data/data_wav_5/"
-file_name = "real_rec_001.wav"
-Player.save_rec(name=path+file_name)
+file_name = "real_rec_"
+zero_num = get_zero_string()
+Player.save_rec(name=path+file_name+zero_num+".wav")
 # File.close()

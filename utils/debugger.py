@@ -51,7 +51,7 @@ class Debugger():
         plt.quiver(0, 0, 3*np.cos(theta), 3*np.sin(theta), angles='xy',  scale_units='xy', scale=1)
         if show:
             plt.show()
-            plt.pause(0.000001)
+            plt.pause(0.0001)
 
     def draw_sound_in_room(self, x, y):
         # head = plt.Circle((0, 0), 0.2, color='r')

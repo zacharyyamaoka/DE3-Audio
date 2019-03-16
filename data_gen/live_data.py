@@ -16,6 +16,7 @@ import os
 sys.path.append(os.path.join(os.getcwd(), "utils"))
 from debugger import Debugger
 from data_writer_util import LabelFile
+from data_utils import get_zero_string
 
 
 ############### Set Up Stuff
@@ -52,20 +53,23 @@ stream = p.open(format=p.get_format_from_width(WIDTH),
                 output=True,
                 stream_callback=callback)
 
+stream.stop_stream()
 
 #Set up
 
 Walker = RandomPolarWalker()
 Viz = Debugger()
 #MAKE SURE TO CHANGE THE FILE NUMBER
-File = LabelFile(0)
+DATA_N = 0
+File = LabelFile(num=DATA_N,stem="real_rec_",path="/Users/zachyamaoka/Documents/de3_audio/data_real_label/")
 
 last_time = time.time()
 
 ##############################
 """IMPORTANT"""
 rec_time = 1 * 60
-label_freq = 100
+# rec_time = 5
+label_freq = 10
 ##############################
 
 #TODO Make it so you can get a chunck to pass to the NN. Then you come back and get the next best chunck
@@ -76,7 +80,8 @@ time_running = 0
 label_time = 0
 label_period = 1/label_freq
 
-
+draw_time = 0
+draw_period = 0.1
 
 # Wait for person to get into correct position
 theta = Walker.heading()
@@ -103,22 +108,30 @@ while time_running < rec_time:
     last_time = curr_time
     time_running += dt
     label_time += dt
+    draw_time += dt
 
     Walker.slow_update(dt)
     theta = Walker.heading()
-    Viz.draw_heading(theta)
+
+    if draw_time >= draw_period:
+        draw_time = 0
+        Viz.draw_heading(theta)
 
     if label_time >= label_period:
+        print(label_time)
         label_time = 0
         File.write_heading(theta)
 
 stream.stop_stream()
 stream.close()
 
-path = "/Users/zachyamaoka/Dropbox/de3_audio_data/data_wav_5/"
-file_name = "real_rec_001.wav"
-name=path+file_name
 
+zero_num = get_zero_string(DATA_N)
+
+path = "/Users/zachyamaoka/Dropbox/de3_audio_data/data_real_wav/"
+file_name = "real_rec_"
+name=path+file_name+zero_num+".wav"
+print(name)
 save_wav(frames, name)
 
 p.terminate()
