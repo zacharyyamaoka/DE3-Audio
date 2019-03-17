@@ -62,10 +62,12 @@ class ToTensor():
 class AudioLocationNN(torch.nn.Module):
     def __init__(self):
         super().__init__()
-        self.conv1 = torch.nn.Conv1d(2, 96, kernel_size=7, stride=2, padding=1)
-        self.conv2 = torch.nn.Conv1d(96, 128, kernel_size=7, stride=2, padding=1)
-        self.conv3 = torch.nn.Conv1d(128, 128, kernel_size=4, stride=2, padding=1)
-        self.dense1 = torch.nn.Linear(128*510, 500)
+        self.conv1 = torch.nn.Conv1d(2, 96, kernel_size=7, stride=1, padding=0)
+        self.conv2 = torch.nn.Conv1d(96, 128, kernel_size=7, stride=1, padding=0)
+        self.conv3 = torch.nn.Conv1d(128, 128, kernel_size=5, stride=1, padding=0)
+        self.conv4 = torch.nn.Conv1d(128, 128, kernel_size=5, stride=1, padding=0)
+        self.conv5 = torch.nn.Conv1d(128, 128, kernel_size=3, stride=1, padding=0)
+        self.dense1 = torch.nn.Linear(128*4074, 500)
         self.dense2 = torch.nn.Linear(500, 2)
 
         self.d = torch.nn.Dropout(p=0.5)
@@ -73,7 +75,9 @@ class AudioLocationNN(torch.nn.Module):
     def forward(self, x):
         x = F.relu(self.conv1(x))
         x = F.relu(self.conv2(x))
-        x = F.relu(self.conv3(x)).view(-1, 128*510)
+        x = F.relu(self.conv3(x))
+        x = F.relu(self.conv4(x))
+        x = F.relu(self.conv5(x)).view(-1, 128*4074)
         x = F.relu(self.dense1(x))
         x = self.d(x)
         x = self.dense2(x)
