@@ -21,4 +21,5 @@ class SoundLocalizer():
         if r_total<=l_total:
             theta = -np.pi/2
 
+        theta = np.pi/2
         return theta
