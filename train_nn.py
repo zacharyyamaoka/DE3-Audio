@@ -70,14 +70,12 @@ class ToTensor():
 class AudioLocationNN(torch.nn.Module):
     def __init__(self):
         super().__init__()
-        self.conv1 = torch.nn.Conv1d(2, 96, kernel_size=8, stride=8, padding=1)
-        self.conv2 = torch.nn.Conv1d(96, 128, kernel_size=8, stride=8, padding=1)
-        self.conv3 = torch.nn.Conv1d(128, 256, kernel_size=8, stride=8, padding=1)
-        self.conv4 = torch.nn.Conv1d(256, 512, kernel_size=8, stride=8, padding=1)
-        self.conv5 = torch.nn.Conv1d(512, 1024, kernel_size=8, stride=8, padding=1)
-        self.dense1 = torch.nn.Linear(1024*6, 2048)
-        self.dense2 = torch.nn.Linear(2048, 500)
-        self.dense3 = torch.nn.Linear(500, 1)
+        self.conv1 = torch.nn.Conv1d(2, 96, kernel_size=8, stride=4, padding=1)
+        self.conv2 = torch.nn.Conv1d(96, 128, kernel_size=8, stride=4, padding=1)
+        self.conv3 = torch.nn.Conv1d(128, 256, kernel_size=8, stride=4, padding=1)
+        self.conv4 = torch.nn.Conv1d(256, 512, kernel_size=8, stride=4, padding=1)
+        self.dense1 = torch.nn.Linear(512*751, 500)
+        self.dense2 = torch.nn.Linear(500, 1)
 
         self.d = torch.nn.Dropout(p=0.5)
 
@@ -85,16 +83,14 @@ class AudioLocationNN(torch.nn.Module):
         x = F.relu(self.conv1(x))
         x = F.relu(self.conv2(x))
         x = F.relu(self.conv3(x))
-        x = F.relu(self.conv4(x))
-        x = F.relu(self.conv5(x)).view(-1, 1024*6)
+        x = F.relu(self.conv4(x)).view(-1, 512*751)
         x = F.relu(self.dense1(x))
-        x = F.relu(self.dense2(x))
-        x = self.dense3(x)
+        x = self.dense2(x)
         return x
 
 data = AudioLocationDataset(transform = ToTensor())
 
-batch_size = 1
+batch_size = 32
 
 train_samples = torch.utils.data.DataLoader(dataset=data,
                                               batch_size=batch_size,
@@ -109,17 +105,11 @@ regularization = 0#1e-4
 epochs = 10 #number of epochs
 
 model = AudioLocationNN() #instantiate model
-optimizer = torch.optim.SGD(model.parameters(), lr=lr, weight_decay=regularization) #optimizer
+optimizer = torch.optim.Adam(model.parameters(), lr=lr) #optimizer
 
 def round_down(num, divisor):
     return num - (num%divisor)
 
-def radial_loss(h, y):
-    x = torch.abs(h.sub(y))
-    x = torch.remainder(x, np.pi)
-    x = torch.sum(x)
-    return x
-    
 def train(epochs):
     #for plotting cost per batch
     costs = []
@@ -153,7 +143,7 @@ def train(epochs):
             h = model.forward(x) #calculate hypothesis
             print('Pred', h.detach().numpy(), '\nLabel', y.detach().numpy())
 
-            cost = radial_loss(h, y) #calculate cost
+            cost = F.mse_loss(h, y) #calculate cost
 
             optimizer.zero_grad() #zero gradients
             cost.backward() # calculate derivatives of values of filters
@@ -182,7 +172,7 @@ def train(epochs):
             ax2.plot(x.detach().numpy()[showind, 1, :], 'b')
 
             fig.canvas.draw()
-            plt.pause(0.001)
+            plt.pause(0.00001)
             print('Epoch', e, '\tBatch', i, '\tCost', cost.item())
 
 
