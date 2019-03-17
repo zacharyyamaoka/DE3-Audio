@@ -12,7 +12,7 @@ class Debugger():
         # self.l_ax = self.fig2.add_subplot(211)
         # self.r_ax = self.fig2.add_subplot(212)
 
-        self.fig1 = plt.figure(1)
+        self.fig1 = plt.figure(1,figsize=(16,9))
         self.ax1 = self.fig1.add_subplot(111, aspect='equal')
         self.w = 10
 

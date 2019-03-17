@@ -60,14 +60,14 @@ stream.stop_stream()
 Walker = RandomPolarWalker()
 Viz = Debugger()
 #MAKE SURE TO CHANGE THE FILE NUMBER
-DATA_N = 0
+DATA_N = 4
 File = LabelFile(num=DATA_N,stem="real_rec_",path="/Users/zachyamaoka/Documents/de3_audio/data_real_label/")
 
 last_time = time.time()
 
 ##############################
 """IMPORTANT"""
-rec_time = 1 * 60
+rec_time = 10 * 60
 # rec_time = 5
 label_freq = 10
 ##############################

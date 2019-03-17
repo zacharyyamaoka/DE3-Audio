@@ -50,10 +50,11 @@ class RandomPolarWalker():
         self.timer = 0
         self.slow_timer = 0
         self.accel = 0.5
-        self.slow_speed = 0.5
+        self.slow_speed = 0.01
         #
         if np.random.random() > 0.5:
-            self.slow_speed *= 1
+            self.slow_speed *= -1
+
     def slow_update(self, dt=0.1): # this walker just goes around in circles at a more consitent and slow Rate
         self.slow_timer += dt
 
