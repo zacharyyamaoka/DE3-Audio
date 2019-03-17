@@ -7,10 +7,10 @@ from pythonosc import udp_client
 
 class DataSender():
 
-    def __init__(self):
+    def __init__(self, ip="127.0.0.1", port=7400):
         parser = argparse.ArgumentParser()
-        parser.add_argument("--ip", default="146.169.222.168", help="The ip of the OSC server")
-        parser.add_argument("--port", type=int, default=7400, help="The port the OSC server is listening on")
+        parser.add_argument("--ip", default=ip, help="The ip of the OSC server")
+        parser.add_argument("--port", type=int, default=port, help="The port the OSC server is listening on")
         args = parser.parse_args()
         self.client = udp_client.SimpleUDPClient(args.ip, args.port)
 
@@ -18,10 +18,14 @@ class DataSender():
         """Send x y positon to Sophie's computer to be displayed on projector"""
         self.client.send_message("/filter", (x,y))
 
+    def send_heading(self, theta, var):
+        """Send x y positon to Sophie's computer to be displayed on projector"""
+        self.client.send_message("/heading", (theta,var))
 
 
 #### TEST CODE ####
 
-Sender = DataSender()
-
-Sender.send_position(10,10)
+# Sender = DataSender()
+#
+# Sender.send_position(10,10)
+# Sender.send_heading(10,10)

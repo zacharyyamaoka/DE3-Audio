@@ -8,13 +8,13 @@ from debugger import *
 from audio_utils import *
 
 class AudioPlayer():
-    def __init__(self, chunk = 1024):
+    def __init__(self, chunk = 1024, sample_rate=44100):
         # self.p = pyaudio.PyAudio()
         self.CHUNKSIZE = chunk
         self.p = pyaudio.PyAudio()
         self.FORMAT = pyaudio.paInt16
         self.CHANNELS = 2
-        self.RATE = 44100
+        self.RATE = sample_rate
 
         self.stream_out = self.p.open(format=self.FORMAT,
                 channels=self.CHANNELS ,
@@ -58,6 +58,7 @@ class AudioPlayer():
         self.stream_in.start_stream()
         data = self.stream_in.read(chunk)
         self.stream_in.stop_stream() #pause so you don't over flow
+        return data
 
     def stream_audio(self, live=False, playback=False, get_data=False, use_viz=False):
         if live:
@@ -82,7 +83,7 @@ class AudioPlayer():
         return sound_array
 
     def record(self, chunk=2**12, playback=False):
-        print("rec time: ", chunk/44100)
+        print("rec time: ", chunk/self.RATE)
         # self.stream_in.start_stream()
         data = self.stream_in.read(chunk)
         if playback:
