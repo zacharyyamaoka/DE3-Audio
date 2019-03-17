@@ -117,7 +117,7 @@ def round_down(num, divisor):
 def radial_loss(h, y):
     x = torch.abs(h.sub(y))
     x = torch.remainder(x, np.pi)
-    x = torch.sum(x
+    x = torch.sum(x)
     return x
     
 def train(epochs):
