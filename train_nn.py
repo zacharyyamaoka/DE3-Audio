@@ -104,7 +104,7 @@ sample_rate = 96000 #hertz
 label_rate = 10 #hertz
 chunk_size = 2048 #number of samples to feed to model
 
-lr = 0.001 #learning rate
+lr = 0.0003 #learning rate
 regularization = 1e-4
 epochs = 10 #number of epochs
 
