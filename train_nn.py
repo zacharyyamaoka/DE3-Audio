@@ -101,7 +101,7 @@ label_rate = 10 #hertz
 chunk_size = 2048 #number of samples to feed to model
 
 lr = 0.0003 #learning rate
-epochs = 10 #number of epochs
+epochs = 100 #number of epochs
 
 model = AudioLocationNN() #instantiate model
 optimizer = torch.optim.Adam(model.parameters(), lr=lr) #optimizer
@@ -171,7 +171,7 @@ def train(epochs):
             ax2.plot(x.detach().numpy()[showind, 1, :], 'b')
 
             fig.canvas.draw()
-            plt.pause(0.001)
+            plt.pause(0.00001)
             print('Epoch', e, '\tBatch', i, '\tCost', cost.item())
 
 
