@@ -110,6 +110,12 @@ optimizer = torch.optim.Adam(model.parameters(), lr=lr) #optimizer
 def round_down(num, divisor):
     return num - (num%divisor)
 
+def radial_loss(h, y):
+    x = torch.abs(h.sub(y))
+    x = torch.remainder(x, np.pi)
+    x = torch.sum(x)
+    return x
+
 def train(epochs):
     #for plotting cost per batch
     costs = []
