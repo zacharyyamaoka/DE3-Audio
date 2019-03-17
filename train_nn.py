@@ -13,7 +13,7 @@ sys.path.append(os.path.join(os.getcwd(), "utils"))
 from data_utils import *
 
 class AudioLocationDataset(Dataset):
-    def __init__(self, root="./data_label/", transform=None):
+    def __init__(self, root="./data_real_label/", transform=None):
         self.fnames = glob.glob(root+"*.txt")
         self.root = root
         #self.filenames = self.csv['Filename'].tolist()
@@ -24,13 +24,14 @@ class AudioLocationDataset(Dataset):
         return len(self.fnames)
 
     def __getitem__(self, idx):
-        audio, label, rates = load_data_file(n=idx, audio_n_offset=1, label_rate=100)
+        audio, label, rates = load_data_file(n=idx, audio_n_offset=0, label_rate=10, file_stem="real_rec_", data_label_path = "./data_real_label/", data_wav_path = "./../data_real_wav/")
         audio = audio.T
-        label = label[:, :2]
-        label = np.apply_along_axis(toPolar, 1, label)
+        #label = label[:, :2]
+        label = np.expand_dims(label, 1)
+
         #cut so they are all the same length
-        audio = audio[:, :26146890]
-        label = label[:59291, :]
+        audio = audio[:, :26420223]  #26146890 for synthetic
+        label = label[:5995, :] #59291 for synthetic
 
         if self.transform:
             audio, label = self.transform((audio, label))
@@ -76,7 +77,6 @@ class AudioLocationNN(torch.nn.Module):
         x = F.relu(self.conv2(x))
         x = F.relu(self.conv3(x)).view(-1, 128*254)
         x = F.relu(self.dense1(x))
-        x = self.d(x)
         x = self.dense2(x)
         return x
 
@@ -90,7 +90,7 @@ train_samples = torch.utils.data.DataLoader(dataset=data,
                                               shuffle=True)
 
 sample_rate = 44100 #hertz
-label_rate = 100 #hertz
+label_rate = 10 #hertz
 chunk_size = 2048 #number of samples to feed to model
 
 lr = 0.0003 #learning rate
@@ -132,13 +132,12 @@ def train(epochs):
                 #print(x.shape)
                 label_ind = sample2labelId(end_ind, sample_rate, label_rate)
                 y = yb[:, label_ind , :]
-
-                ylabel = y[:, 1].unsqueeze(dim=0).transpose(0, 1)
+                #ylabel = y[:, 1].unsqueeze(dim=0).transpose(0, 1)
 
                 h = model.forward(x) #calculate hypothesis
-                print('Pred', h.detach().numpy(), '\nLabel', ylabel.detach().numpy())
+                print('Pred', h.detach().numpy(), '\nLabel', y.detach().numpy())
 
-                cost = F.mse_loss(h, ylabel) #calculate cost
+                cost = F.mse_loss(h, y) #calculate cost
 
                 optimizer.zero_grad() #zero gradients
                 cost.backward() # calculate derivatives of values of filters
@@ -148,9 +147,9 @@ def train(epochs):
                 ax.plot(costs, 'b')
                 ax.set_ylim(0, 100)
 
-                showind = np.random.randint(batch_size)
+                showind = np.random.randint(xb.shape[0])
 
-                rhophi1 = [y.detach().numpy()[showind, 0], y.detach().numpy()[showind, 1]]
+                rhophi1 = [5, y.detach().numpy()[showind, 0]]
                 xy1 = toCartesian(rhophi1)
                 rhophi2 = [5, h.detach().numpy()[showind, 0]] #h.detach().numpy()[0, 0]
                 #rhophi2[0] = np.min([abs(rhophi2[0]), 5])

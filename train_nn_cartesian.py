@@ -24,9 +24,9 @@ class AudioLocationDataset(Dataset):
         return len(self.fnames)
 
     def __getitem__(self, idx):
-        audio, label, rates = load_data_file(n=idx, audio_n_offset=1, label_rate=100)
+        audio, label, rates = load_data_file(n=idx, audio_n_offset=1, label_rate=100, file_stem="data_rec", data_label_path = "./data_label/", data_wav_path = "./../data_wav/")
         audio = audio.T
-        label = label[:, :2]
+        label = label[:,:2]
         #cut so they are all the same length
         audio = audio[:, :26146890]
         label = label[:59291, :]
@@ -65,7 +65,7 @@ class AudioLocationNN(torch.nn.Module):
         self.conv1 = torch.nn.Conv1d(2, 96, kernel_size=7, stride=2, padding=1)
         self.conv2 = torch.nn.Conv1d(96, 128, kernel_size=7, stride=2, padding=1)
         self.conv3 = torch.nn.Conv1d(128, 128, kernel_size=4, stride=2, padding=1)
-        self.dense1 = torch.nn.Linear(128*254, 500)
+        self.dense1 = torch.nn.Linear(128*510, 500)
         self.dense2 = torch.nn.Linear(500, 2)
 
         self.d = torch.nn.Dropout(p=0.5)
@@ -73,7 +73,7 @@ class AudioLocationNN(torch.nn.Module):
     def forward(self, x):
         x = F.relu(self.conv1(x))
         x = F.relu(self.conv2(x))
-        x = F.relu(self.conv3(x)).view(-1, 128*254)
+        x = F.relu(self.conv3(x)).view(-1, 128*510)
         x = F.relu(self.dense1(x))
         x = self.d(x)
         x = self.dense2(x)
@@ -90,7 +90,7 @@ train_samples = torch.utils.data.DataLoader(dataset=data,
 
 sample_rate = 44100 #hertz
 label_rate = 100 #hertz
-chunk_size = 2048 #number of samples to feed to model
+chunk_size = 4096 #number of samples to feed to model
 
 lr = 0.0003 #learning rate
 epochs = 10 #number of epochs
