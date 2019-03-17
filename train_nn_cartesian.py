@@ -69,7 +69,7 @@ class AudioLocationNN(torch.nn.Module):
         self.dense2 = torch.nn.Linear(500, 2)
 
         self.d = torch.nn.Dropout(p=0.5)
-        
+
     def forward(self, x):
         x = F.relu(self.conv1(x))
         x = F.relu(self.conv2(x))
@@ -77,7 +77,7 @@ class AudioLocationNN(torch.nn.Module):
         x = F.relu(self.dense1(x))
         x = self.d(x)
         x = self.dense2(x)
-        return x          
+        return x
 
 data = AudioLocationDataset(transform = ToTensor())
 

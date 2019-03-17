@@ -70,7 +70,7 @@ class AudioLocationNN(torch.nn.Module):
         self.dense2 = torch.nn.Linear(500, 1)
 
         self.d = torch.nn.Dropout(p=0.5)
-        
+
     def forward(self, x):
         x = F.relu(self.conv1(x))
         x = F.relu(self.conv2(x))
@@ -78,7 +78,7 @@ class AudioLocationNN(torch.nn.Module):
         x = F.relu(self.dense1(x))
         x = self.d(x)
         x = self.dense2(x)
-        return x        
+        return x
 
 data = AudioLocationDataset(transform = ToTensor())
 
@@ -146,11 +146,7 @@ def train(epochs):
 
                 costs.append(cost.item())
                 ax.plot(costs, 'b')
-<<<<<<< HEAD
-                # ax.set_ylim(0, 50)
-=======
-                #ax.set_ylim(0, 100)
->>>>>>> c6662efd3bcea520822f3e7bb8c8fef020d9dc9d
+                ax.set_ylim(0, 100)
 
                 showind = np.random.randint(batch_size)
 

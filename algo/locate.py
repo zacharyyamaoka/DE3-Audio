@@ -9,16 +9,16 @@ class SoundLocalizer():
         #PUT HAROONS CODE INTO HERE
 
         radius =  1
-        theta = 0
         re = audio_vec[0,:]
         le = audio_vec[1,:]
+
         r_total = np.sum(re)
         l_total = np.sum(le)
 
         if r_total>l_total:
-            theta = 0
+            theta = np.pi/2
 
-        if r_total<l_total:
-            theta = np.deg2rad(180)
+        if r_total<=l_total:
+            theta = -np.pi/2
 
-        return radius, theta
+        return theta

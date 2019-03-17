@@ -1,15 +1,18 @@
 
 from locate import SoundLocalizer
 from filter import PositionFilter
-
+import numpy as np
 # Audio Localization Algorithm
 
 Localizer = SoundLocalizer()
-Filterer = PositionFilter()
+KF = PositionFilter()
 
-def ala(audio_vec):
+def ala(audio_vec): # Main Computation
 
-    r, theta = Localizer.locate(audio_vec)
-    r_filtered, theta_filtered = Filterer.filter(r, theta)
+    pred_theta = Localizer.locate(audio_vec)
 
-    return r_filtered, theta_filtered
+    pred_var = np.pi #180
+
+    theta_mu, theta_var = KF.filter(pred_theta, pred_var)
+
+    return theta_mu, theta_var
