@@ -129,7 +129,7 @@ def train(epochs):
 
                 costs.append(cost.item())
                 ax.plot(costs, 'b')
-                ax.set_ylim(0, 50)
+                # ax.set_ylim(0, 50)
 
                 rhophi1 = [y.detach().numpy()[0, 0], y.detach().numpy()[0, 1]]
                 xy1 = toCartesian(rhophi1)

@@ -107,13 +107,10 @@ def listen_2_data(all_data, window_chunk=1024, audio_rate=44100, label_rate=100)
         if count % 50 == 0:
         # if ind != last_ind: #only go further if he has moved, may get lag if label rate 2 high
             last_ind = ind
-            print("ind", ind)
-            print(label.shape)
             pos = label[ind,:]
             if len(pos) == 3: #xyz
                 r = np.sqrt(pos[0]**2 + pos[1]**2)
                 theta = np.cos(pos[0]/r)
-                print(r, theta)
                 Viz.draw_sound_in_room(pos[0], pos[1])
             else: #theta
                 Viz.draw_heading(pos[0])
@@ -136,11 +133,19 @@ def show_data(data, labels):
 
 
 if __name__ == '__main__':
-    data = load_data_file(n=0,label_rate = 10,file_stem="real_rec_",
-    data_label_path="/Users/zachyamaoka/Documents/de3_audio/data_real_label/",
-    data_wav_path="/Users/zachyamaoka/Dropbox/de3_audio_data/data_real_wav/")
+    # data = load_data_file(n=0,label_rate = 10,file_stem="real_rec_",
+    # data_label_path="/Users/zachyamaoka/Documents/de3_audio/data_real_label/",
+    # data_wav_path="/Users/zachyamaoka/Dropbox/de3_audio_data/data_real_wav/")
+    #
+    # listen_2_data(data,label_rate = 10)
 
-    listen_2_data(data,label_rate = 10)
+    data = load_data_file(n=1,label_rate = 100,file_stem="data_rec",
+    data_label_path="/Users/zachyamaoka/Documents/de3_audio/data_label/",
+    data_wav_path="/Users/zachyamaoka/Dropbox/de3_audio_data/data_wav_5/")
+
+    listen_2_data(data,label_rate = 100)
+
+
     print("Data Params")
     print("Audio Stero Vector: ", data[0].shape, " Sample Rate: ", data[2][0])
     print("Position Label: ", data[1].shape, " Label Rate: ", data[2][1])

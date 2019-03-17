@@ -75,4 +75,4 @@ class Debugger():
         # room = patches.Rectangle((-w/2,-l/2),w,l,linewidth=1,fill=False)
         # ax.add_patch(room)
         plt.show()
-        # plt.pause(0.0001)
+        plt.pause(0.0001)
