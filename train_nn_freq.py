@@ -31,11 +31,14 @@ class AudioLocationDataset(Dataset):
         #cut so they are all the same length
         audio = audio[:, :26146890]
         label = label[:59291, :]
+        frequencies, times, spec1 = signal.spectrogram(audio[1, :], 44100)
+        frequencies, times, spec2 = signal.spectrogram(audio[1, :], 44100)
+        spectrogram = np.vstack((spec1, spec2))
 
         if self.transform:
-            audio, label = self.transform((audio, label))
+            spectrogram, label = self.transform((spectrogram, label))
 
-        return audio, label
+        return spectrogram, label
 
 def toPolar(xy):
     x = xy[0]
@@ -63,22 +66,40 @@ class ToTensor():
 class AudioLocationNN(torch.nn.Module):
     def __init__(self):
         super().__init__()
-        self.conv1 = torch.nn.Conv1d(2, 96, kernel_size=7, stride=2, padding=1)
-        self.conv2 = torch.nn.Conv1d(96, 128, kernel_size=7, stride=2, padding=1)
-        self.conv3 = torch.nn.Conv1d(128, 128, kernel_size=4, stride=2, padding=1)
-        self.dense1 = torch.nn.Linear(128*254, 500)
-        self.dense2 = torch.nn.Linear(500, 1)
-
-        self.d = torch.nn.Dropout(p=0.5)
-        
+        self.conv1 = torch.nn.Conv1d(258, 128, kernel_size=4, stride=2, padding=1)
+        #self.conv2 = torch.nn.Conv1d(2, 2, kernel_size=4, stride=2, padding=1)
+        self.conv3 = torch.nn.Conv1d(128, 64, kernel_size=3, stride=1, padding=1)
+        self.dense1 = torch.nn.Linear(128, 1)
     def forward(self, x):
-        x = F.relu(self.conv1(x))
-        x = F.relu(self.conv2(x))
-        x = F.relu(self.conv3(x)).view(-1, 128*254)
-        x = F.relu(self.dense1(x))
-        x = self.d(x)
-        x = self.dense2(x)
-        return x        
+        x = F.relu(self.conv1(x)).view(-1, 128)
+        #print(x.shape)
+        #x = F.relu(self.conv2(x))
+        #x = F.relu(self.conv3(x)).view(-1, 256)
+        x = self.dense1(x)
+        return x
+
+'''
+audio, label, rates = load_data_file(n=2, audio_n_offset=1, label_rate=100)
+audio = audio.T
+label = label[:, :2]
+label = np.apply_along_axis(toPolar, 1, label)
+#cut so they are all the same length
+audio = audio[:, :26146890]
+label = label[:59291, :]
+samples = audio[1, :]
+print(samples.shape)
+frequencies, times, spectrogram = signal.spectrogram(samples, 44100)
+print(frequencies[:10], frequencies.shape)
+print(times[:10], times.shape)
+print(spectrogram.shape)
+plt.figure()
+plt.pcolormesh(times, frequencies, spectrogram)
+plt.imshow(spectrogram[:, :1000])
+plt.show()
+gg
+'''
+
+        
 
 data = AudioLocationDataset(transform = ToTensor())
 
@@ -89,11 +110,11 @@ train_samples = torch.utils.data.DataLoader(dataset=data,
                                               batch_size=batch_size,
                                               shuffle=True)
 
-sample_rate = 44100 #hertz
+sample_rate = 196.875 #hertz
 label_rate = 100 #hertz
-chunk_size = 2048 #number of samples to feed to model
+chunk_size = 2 #number of samples to feed to model
 
-lr = 0.0003 #learning rate
+lr = 0.001 #learning rate
 epochs = 10 #number of epochs
 
 model = AudioLocationNN() #instantiate model
@@ -106,18 +127,14 @@ def train(epochs):
     #for plotting cost per batch
     costs = []
     plt.ion()
-    fig = plt.figure(figsize=(15, 5))
-    ax = fig.add_subplot(131)
-    ax1 = fig.add_subplot(132)
-    ax2 = fig.add_subplot(133)
+    fig = plt.figure(figsize=(10, 5))
+    ax = fig.add_subplot(121)
+    ax1 = fig.add_subplot(122)
     ax.set_xlabel('Sample')
     ax.set_ylabel('Cost')
 
     ax1.set_xlabel('x')
     ax1.set_ylabel('y')
-
-    ax2.set_xlabel('Time')
-    ax2.set_ylabel('Amplitude')
 
     plt.show()
 
@@ -126,6 +143,7 @@ def train(epochs):
             #xb, yb = torch.squeeze(xb), torch.squeeze(yb)
             print('Audio shape', xb.shape, 'Label shape', yb.shape)
             for j in range(100):
+                #start_ind = np.random.randint(j * sample_rate//label_rate, ((j+1) * sample_rate//label_rate)- chunk_size)
                 start_ind = np.random.randint(0, xb.shape[2]-chunk_size)
                 end_ind = start_ind+chunk_size
                 x = xb[:, :, start_ind:end_ind]
@@ -146,7 +164,7 @@ def train(epochs):
 
                 costs.append(cost.item())
                 ax.plot(costs, 'b')
-                #ax.set_ylim(0, 100)
+                ax.set_ylim(0, 100)
 
                 showind = np.random.randint(batch_size)
 
@@ -161,10 +179,6 @@ def train(epochs):
                 ax1.scatter([[0]], [[0]], c='r', marker='x')
                 ax1.set_xlim(-10, 10)
                 ax1.set_ylim(-10, 10)
-
-                ax2.clear()
-                ax2.plot(x.detach().numpy()[showind, 0, :], 'r')
-                ax2.plot(x.detach().numpy()[showind, 1, :], 'b')
 
                 fig.canvas.draw()
                 plt.pause(0.001)

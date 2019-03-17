@@ -1,4 +1,3 @@
-
 import numpy as np
 import pyaudio
 import wave
@@ -36,7 +35,7 @@ def load_data_file(n=1,audio_n_offset=0,file_stem="data_rec",sample_rate = 44100
 
     #========================================
 
-    label_num = get_zero_string(n)
+    label_num = get_zero_string(n+audio_n_offset)
     audio_num = get_zero_string(n+audio_n_offset)
 
     label_file_path = data_label_path+file_stem+label_num+".txt"
@@ -129,19 +128,11 @@ def show_data(data, labels):
 
 
 if __name__ == '__main__':
-<<<<<<< HEAD
     data = load_data_file(n=1,label_rate = 100)
     listen_2_data(data)
     #print("Data Params")
     #print("Audio Stero Vector: ", data[0].shape, " Sample Rate: ", data[2][0])
     #print("Position Label: ", data[1].shape, " Label Rate: ", data[2][1])
-=======
-    data = load_data_file(n=6,label_rate = 100)
-    # listen_2_data(data)
-    print("Data Params")
-    print("Audio Stero Vector: ", data[0].shape, " Sample Rate: ", data[2][0])
-    print("Position Label: ", data[1].shape, " Label Rate: ", data[2][1])
->>>>>>> 8ba5c2dd3e165c94f5b582fb98c03df5610a7cc6
     '''
     ind = sample2labelId(0, 44100, 1) #will be some small error, but no more then 1 label so its ok....
     # assert ind == 0

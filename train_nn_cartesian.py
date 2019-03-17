@@ -27,7 +27,6 @@ class AudioLocationDataset(Dataset):
         audio, label, rates = load_data_file(n=idx, audio_n_offset=1, label_rate=100)
         audio = audio.T
         label = label[:, :2]
-        label = np.apply_along_axis(toPolar, 1, label)
         #cut so they are all the same length
         audio = audio[:, :26146890]
         label = label[:59291, :]
@@ -67,7 +66,7 @@ class AudioLocationNN(torch.nn.Module):
         self.conv2 = torch.nn.Conv1d(96, 128, kernel_size=7, stride=2, padding=1)
         self.conv3 = torch.nn.Conv1d(128, 128, kernel_size=4, stride=2, padding=1)
         self.dense1 = torch.nn.Linear(128*254, 500)
-        self.dense2 = torch.nn.Linear(500, 1)
+        self.dense2 = torch.nn.Linear(500, 2)
 
         self.d = torch.nn.Dropout(p=0.5)
         
@@ -78,7 +77,7 @@ class AudioLocationNN(torch.nn.Module):
         x = F.relu(self.dense1(x))
         x = self.d(x)
         x = self.dense2(x)
-        return x        
+        return x          
 
 data = AudioLocationDataset(transform = ToTensor())
 
@@ -126,6 +125,7 @@ def train(epochs):
             #xb, yb = torch.squeeze(xb), torch.squeeze(yb)
             print('Audio shape', xb.shape, 'Label shape', yb.shape)
             for j in range(100):
+                #start_ind = np.random.randint(j * sample_rate//label_rate, ((j+1) * sample_rate//label_rate)- chunk_size)
                 start_ind = np.random.randint(0, xb.shape[2]-chunk_size)
                 end_ind = start_ind+chunk_size
                 x = xb[:, :, start_ind:end_ind]
@@ -133,12 +133,12 @@ def train(epochs):
                 label_ind = sample2labelId(end_ind, sample_rate, label_rate)
                 y = yb[:, label_ind , :]
 
-                ylabel = y[:, 1].unsqueeze(dim=0).transpose(0, 1)
-
                 h = model.forward(x) #calculate hypothesis
-                print('Pred', h.detach().numpy(), '\nLabel', ylabel.detach().numpy())
+                print('Pred', h.detach().numpy(), '\nLabel', y.detach().numpy())
 
-                cost = F.mse_loss(h, ylabel) #calculate cost
+                yangles = torch.atan2(y[:, 1], y[:, 0])
+                hangles = torch.atan2(h[:, 1], h[:, 0])
+                cost = 3*F.mse_loss(hangles, yangles) + F.mse_loss(h, y) #calculate cost
 
                 optimizer.zero_grad() #zero gradients
                 cost.backward() # calculate derivatives of values of filters
@@ -149,15 +149,11 @@ def train(epochs):
                 #ax.set_ylim(0, 100)
 
                 showind = np.random.randint(batch_size)
-
-                rhophi1 = [y.detach().numpy()[showind, 0], y.detach().numpy()[showind, 1]]
-                xy1 = toCartesian(rhophi1)
-                rhophi2 = [5, h.detach().numpy()[showind, 0]] #h.detach().numpy()[0, 0]
-                #rhophi2[0] = np.min([abs(rhophi2[0]), 5])
-                xy2 = toCartesian(rhophi2)
+                predxy = h.detach().numpy()[showind]
+                #predxy = 5*predxy/np.linalg.norm(predxy)
                 ax1.clear()
-                ax1.scatter(np.expand_dims(xy1[0], 0), np.expand_dims(xy1[1], 0), c='g')
-                ax1.scatter(np.expand_dims(xy2[0], 0), np.expand_dims(xy2[1], 0), c='b')
+                ax1.scatter([y.detach().numpy()[showind, 0]], [y.detach().numpy()[showind, 1]], c='g')
+                ax1.scatter([predxy[0]], [predxy[1]], c='b')
                 ax1.scatter([[0]], [[0]], c='r', marker='x')
                 ax1.set_xlim(-10, 10)
                 ax1.set_ylim(-10, 10)
