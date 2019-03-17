@@ -28,7 +28,7 @@ class TuneInControl():
 
 class RandomPolarWalker():
 
-    def __init__(self):
+    def __init__(self, rec_time = 1):
 
         self.r = np.random.uniform(0,4)
         self.theta = np.random.uniform(0,2*np.pi)
@@ -50,7 +50,7 @@ class RandomPolarWalker():
         self.timer = 0
         self.slow_timer = 0
         self.accel = 0.5
-        self.slow_speed = 0.01
+        self.slow_speed = (2*np.pi)/ (rec_time)
         #
         if np.random.random() > 0.5:
             self.slow_speed *= -1
