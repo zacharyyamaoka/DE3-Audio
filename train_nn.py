@@ -105,7 +105,7 @@ label_rate = 10 #hertz
 chunk_size = 2048 #number of samples to feed to model
 
 lr = 0.0003 #learning rate
-regularization = 1e-4
+regularization = 0#1e-4
 epochs = 10 #number of epochs
 
 model = AudioLocationNN() #instantiate model
@@ -142,7 +142,6 @@ def train(epochs):
     for e in range(epochs):
         for i, (x, y) in enumerate(train_samples):
             print('Audio shape', x.shape, 'Label shape', y.shape)
-            y = y-np.pi
             #start_ind = np.random.randint(0, xb.shape[2]-chunk_size)
             #end_ind = start_ind+chunk_size
             #x = xb[:, :, start_ind:end_ind]
