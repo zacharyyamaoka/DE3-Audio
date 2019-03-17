@@ -46,6 +46,7 @@ while True:
 
     #Grad Recording
     data_raw = Player.get_sample()
+    data_raw = b''.join(data_raw)
     data_vec = decode(data_raw,2)
 
     # Get Prediction

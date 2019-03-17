@@ -15,30 +15,36 @@ import sys
 import os
 sys.path.append(os.path.join(os.getcwd(), "utils"))
 from debugger import Debugger
-from data_writer_util import LabelFile
+from data_writer_util import *
 from data_utils import get_zero_string
 from AudioLive import LivePlayer
 
 
+# N = 0
+file_count = 144 #enter nexts file num
+WINDOW_TIME = 2
+rec_min = 3
+SAMPLE_RATE = 96000
+rec_time = rec_min * 60
 
-WINDOW_TIME = 0.25
-
-Player = LivePlayer(window = WINDOW_TIME, playback=True)
-
-Walker = RandomPolarWalker()
+Player = LivePlayer(window = WINDOW_TIME, playback=True, sample_rate=SAMPLE_RATE)
+wav = WavWriter(path="/Users/zachyamaoka/Dropbox/de3_audio_data/data_clip/", rate=SAMPLE_RATE)
+Walker = RandomPolarWalker(rec_time)
 Viz = Debugger()
+# file = BatchLabel(name="label_"+str(N),path="/Users/zachyamaoka/Documents/de3_audio/data_clip_label/")
+file = BatchLabel(name="label",path="/Users/zachyamaoka/Documents/de3_audio/data_clip_label/")
 
 #MAKE SURE TO CHANGE THE FILE NUMBER
-
-File = LabelFile(num=DATA_N,stem="real_rec_",path="/Users/zachyamaoka/Documents/de3_audio/data_real_label/")
 
 last_time = time.time()
 
 ##############################
 """IMPORTANT"""
-rec_time = 10 * 60
 label_freq = 10
+count_down = 4
+
 ##############################
+
 
 time_running = 0
 label_time = 0
@@ -50,7 +56,6 @@ draw_period = 0.1
 # Wait for person to get into correct position
 theta = Walker.heading()
 
-count_down = 5
 start_up_timer = 0
 while start_up_timer < count_down:
     start_up_timer = time.time() - last_time
@@ -63,6 +68,8 @@ while start_up_timer < count_down:
 #Start and add first label at t = 0
 
 last_time = time.time() # or else you do a massive dt to start
+Player.clear()
+last_window = time.time()
 while time_running < rec_time:
     curr_time = time.time()
     dt = curr_time - last_time
@@ -71,28 +78,26 @@ while time_running < rec_time:
     label_time += dt
     draw_time += dt
 
-    Walker.slow_update(dt)
-    theta = Walker.heading()
+    # theta = Walker.heading()
+    # print(dt)
+    # print(len(Player.frames))
+    if Player.full and curr_time - last_window >= WINDOW_TIME: #buffer full
+        last_window = time.time()
+        print("Saving Files: time stamp ", time_running)
+        data = Player.get_sample_rec()
+        # print(data)
+        wav.save_wav("clip"+str(file_count), data)
 
-    if draw_time >= draw_period:
-        draw_time = 0
-        Viz.draw_heading(theta)
+        theta = Walker.heading()
+        Walker.slow_update(WINDOW_TIME)
+        Viz.draw_heading(theta,show = True)
 
-    if label_time >= label_period:
-        print(label_time)
-        label_time = 0
-        File.write_heading(theta)
+        file.write("clip"+str(file_count)+".wav", theta)
+        file_count += 1
+    #
+    # if draw_time >= draw_period:
+    #     draw_time = 0
+    #     Viz.draw_heading(theta)
 
-stream.stop_stream()
-stream.close()
 
-
-zero_num = get_zero_string(DATA_N)
-
-path = "/Users/zachyamaoka/Dropbox/de3_audio_data/data_real_wav/"
-file_name = "real_rec_"
-name=path+file_name+zero_num+".wav"
-print(name)
-save_wav(frames, name)
-
-p.terminate()
+file.close()

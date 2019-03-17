@@ -1,6 +1,6 @@
 from collections import deque
 import pyaudio
-
+import copy
 
 class LivePlayer():
 
@@ -14,8 +14,9 @@ class LivePlayer():
         self.RATE = sample_rate
 
         self.buffer_len = int(sample_rate*window)
-        self.frames = deque(maxlen = self.buffer_len)
-
+        # self.frames = deque(maxlen = self.buffer_len)
+        self.frames = []
+        self.frame_count = 0
         self.stream = self.p.open(format=self.FORMAT,
                         channels=self.CHANNELS,
                         rate=self.RATE,
@@ -24,21 +25,31 @@ class LivePlayer():
                         stream_callback=self.callback)
 
         # self.stream.stop_stream()
+        self.full = False
 
     def callback(self, in_data, frame_count, time_info, status):
         self.frames.append(in_data)
+        self.frame_count += frame_count
+        if self.frame_count >= self.buffer_len:
+            self.full = True
+
         return (in_data, pyaudio.paContinue)
 
+    def clear(self):
+        self.frames.clear()
+        self.frame_count = 0
+        self.full = False
     def get_sample(self):
         """Returns most recent samples in window segment"""
-        sample = b''.join(self.frames)
-        return sample
+
+        return self.frames
 
     def get_sample_rec(self):
-        """returns buffer and clears it, so next audio is competly new s"""
-        while len(self.frames) < self.buffer_len - 1: # whihle not completly full:
-            pass
+        """returns buffer and clears it"""
 
-        sample = b''.join(self.frames)
+        # sample = b''.join(self.frames)
+        sample = copy.deepcopy(self.frames)
         self.frames.clear()
+        self.frame_count = 0
+        self.full = False
         return sample
