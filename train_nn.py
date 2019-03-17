@@ -90,7 +90,7 @@ class AudioLocationNN(torch.nn.Module):
 
 data = AudioLocationDataset(transform = ToTensor())
 
-batch_size = 3
+batch_size = 32
 
 train_samples = torch.utils.data.DataLoader(dataset=data,
                                               batch_size=batch_size,
@@ -117,7 +117,7 @@ def train(epochs):
     ax = fig.add_subplot(131)
     ax1 = fig.add_subplot(132)
     ax2 = fig.add_subplot(133)
-    ax.set_xlabel('Sample')
+    ax.set_xlabel('Batch')
     ax.set_ylabel('Cost')
 
     ax1.set_xlabel('x')
@@ -150,7 +150,7 @@ def train(epochs):
 
             costs.append(cost.item())
             ax.plot(costs, 'b')
-            ax.set_ylim(0, 100)
+            #ax.set_ylim(0, 100)
 
             showind = np.random.randint(x.shape[0])
 
