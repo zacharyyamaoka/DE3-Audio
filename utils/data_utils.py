@@ -1,4 +1,3 @@
-
 import numpy as np
 import pyaudio
 import wave
@@ -31,7 +30,7 @@ def load_data_file(n=1,audio_n_offset=0,file_stem="data_rec",sample_rate = 44100
 data_label_path="/Users/zachyamaoka/Documents/de3_audio/data_label/",
 data_wav_path="/Users/zachyamaoka/Dropbox/de3_audio_data/data_wav_5/"): #only works up to 10 rn
 
-    label_num = get_zero_string(n)
+    label_num = get_zero_string(n+audio_n_offset)
     audio_num = get_zero_string(n+audio_n_offset)
 
     label_file_path = data_label_path+file_stem+label_num+".txt"
@@ -63,9 +62,9 @@ data_wav_path="/Users/zachyamaoka/Dropbox/de3_audio_data/data_wav_5/"): #only wo
         if data[i,0] != 0:
             start = i
             break;
-    print("num labels, ", num_labels)
+    #print("num labels, ", num_labels)
     label_time = (num_labels-1) * (1/label_rate) #so you get better use out of your last label
-    print("Label Time: ", label_time)
+    #print("Label Time: ", label_time)
     num_sample_labeled = label_time * sample_rate
     end = int(start + num_sample_labeled)
     data = data[start:end,:]
@@ -145,10 +144,10 @@ if __name__ == '__main__':
 
     listen_2_data(data,label_rate = 100)
 
-
     print("Data Params")
     print("Audio Stero Vector: ", data[0].shape, " Sample Rate: ", data[2][0])
     print("Position Label: ", data[1].shape, " Label Rate: ", data[2][1])
+
     '''
     ind = sample2labelId(0, 44100, 1) #will be some small error, but no more then 1 label so its ok....
     # assert ind == 0
