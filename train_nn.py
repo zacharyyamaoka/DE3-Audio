@@ -20,6 +20,10 @@ class AudioLocationDataset(Dataset):
         if use_subset is not None:            
             self.filenames = self.csv['Filename'].tolist()[:use_subset]
             self.labels = self.csv['Label'].tolist()[:use_subset]
+        else:
+            self.filenames = self.csv['Filename'].tolist()
+            self.labels = self.csv['Label'].tolist()
+            
         self.transform = transform
 
     def __len__(self):
@@ -75,8 +79,8 @@ class AudioLocationNN(torch.nn.Module):
         self.conv2 = torch.nn.Conv1d(96, 128, kernel_size=8, stride=4, padding=1)
         self.conv3 = torch.nn.Conv1d(128, 256, kernel_size=8, stride=4, padding=1)
         self.conv4 = torch.nn.Conv1d(256, 512, kernel_size=8, stride=4, padding=1)
-        self.dense1 = torch.nn.Linear(512*751, 500)
-        self.dense2 = torch.nn.Linear(500, 1)
+        self.dense1 = torch.nn.Linear(512*751, 1024)
+        self.dense2 = torch.nn.Linear(1024, 1)
 
         self.d = torch.nn.Dropout(p=0.5)
 
@@ -89,9 +93,9 @@ class AudioLocationNN(torch.nn.Module):
         x = self.dense2(x)
         return x
 
-data = AudioLocationDataset(csv="./data_clip_label/label.csv", transform = ToTensor(), use_subset=30)
+data = AudioLocationDataset(use_subset=None, csv="./data_clip_label/label.csv", transform = ToTensor())
 
-batch_size = 10
+batch_size = 32
 
 train_samples = torch.utils.data.DataLoader(dataset=data,
                                               batch_size=batch_size,
@@ -101,12 +105,12 @@ sample_rate = 96000 #hertz
 label_rate = 10 #hertz
 chunk_size = 2048 #number of samples to feed to model
 
-lr = 0.0001 #learning rate
-regularization = 1e-4
-epochs = 10 #number of epochs
+lr = 0.00003 #learning rate
+regularization = 3e-5
+epochs = 50000 #number of epochs
 
 model = AudioLocationNN() #instantiate model
-model.load_state_dict(torch.load('./trained_models/30.checkpoint'))
+#model.load_state_dict(torch.load('./trained_models/epoch1.checkpoint'))
 optimizer = torch.optim.Adam(model.parameters(), lr=lr) #optimizer
 
 def round_down(num, divisor):
@@ -115,25 +119,32 @@ def round_down(num, divisor):
 def radial_loss(h, y):
     x = torch.abs(h.sub(y))
     x = torch.remainder(x, np.pi)
-    x = torch.sum(x)
+    x = torch.mean(x)
+    return x
+
+def abs_radial_loss(h,y):
+    x = torch.abs(h.sub(y))
+    x = torch.abs(x - np.pi)
+    x = np.pi - x
     return x
 
 def train(epochs):
     #for plotting cost per batch
     costs = []
+    movingavg_costs = []
     plt.ion()
-    fig = plt.figure(figsize=(15, 5))
-    ax = fig.add_subplot(131)
-    ax1 = fig.add_subplot(132)
-    ax2 = fig.add_subplot(133)
+    fig = plt.figure(figsize=(10, 5))
+    ax = fig.add_subplot(121)
+    ax1 = fig.add_subplot(122)
+    #ax2 = fig.add_subplot(133)
     ax.set_xlabel('Batch')
     ax.set_ylabel('Cost')
 
     ax1.set_xlabel('x')
     ax1.set_ylabel('y')
 
-    ax2.set_xlabel('Time')
-    ax2.set_ylabel('Amplitude')
+    #ax2.set_xlabel('Time')
+    #ax2.set_ylabel('Amplitude')
 
     plt.show()
 
@@ -151,14 +162,16 @@ def train(epochs):
             h = model.forward(x) #calculate hypothesis
             print('Pred', h.detach().numpy(), '\nLabel', y.detach().numpy())
 
-            cost = F.mse_loss(h, y) #calculate cost
+            cost = radial_loss(h, y) #calculate cost
 
             optimizer.zero_grad() #zero gradients
             cost.backward() # calculate derivatives of values of filters
             optimizer.step() #update parameters
 
             costs.append(cost.item())
+            movingavg_costs.append(np.mean(costs[-10:]))
             ax.plot(costs, 'b')
+            ax.plot(movingavg_costs, 'g')
             #ax.set_ylim(0, 100)
 
             showind = np.random.randint(x.shape[0])
@@ -175,15 +188,16 @@ def train(epochs):
             ax1.set_xlim(-10, 10)
             ax1.set_ylim(-10, 10)
 
-            ax2.clear()
-            ax2.plot(x.detach().numpy()[showind, 0, :], 'r')
-            ax2.plot(x.detach().numpy()[showind, 1, :], 'b')
+            #ax2.clear()
+            #ax2.plot(x.detach().numpy()[showind, 0, :], 'r')
+            #ax2.plot(x.detach().numpy()[showind, 1, :], 'b')
 
             fig.canvas.draw()
             plt.pause(0.00001)
-            print('Epoch', e, '\tBatch', i, '\tCost', cost.item())
+            print('Epoch', e, '\tBatch', i, '\tCost', cost.item(), '\tavgCost', movingavg_costs[-1])
+        if e+1%15==0:
+            torch.save(model.state_dict(), './trained_models/epoch'+str(e)+'.checkpoint')
 
 
 
 train(epochs)
-#torch.save(model.state_dict(), './trained_models/10.checkpoint')
