@@ -20,6 +20,10 @@ class AudioLocationDataset(Dataset):
         if use_subset is not None:
             self.filenames = self.csv['Filename'].tolist()[:use_subset]
             self.labels = self.csv['Label'].tolist()[:use_subset]
+        else:
+            self.filenames = self.csv['Filename'].tolist()
+            self.labels = self.csv['Label'].tolist()
+
         self.transform = transform
 
     def __len__(self):
@@ -136,8 +140,6 @@ epochs = 50 #number of epochs
 def abs_radial_loss(h,y):
     global batch_size
 
-
-
     x = torch.abs(h.sub(y))
     x = torch.abs(x - np.pi)
     x = np.pi - x
@@ -152,6 +154,7 @@ def abs_radial_loss(h,y):
     # x = torch.abs(x) # must be positive
     x = torch.sum(x)
     x = x/batch_size
+
     return x
 
 trained_model_path = "/Users/zachyamaoka/Dropbox/de3_audio_data/trained_model/"
@@ -166,25 +169,32 @@ def round_down(num, divisor):
 def radial_loss(h, y):
     x = torch.abs(h.sub(y))
     x = torch.remainder(x, np.pi)
-    x = torch.sum(x)
+    x = torch.mean(x)
+    return x
+
+def abs_radial_loss(h,y):
+    x = torch.abs(h.sub(y))
+    x = torch.abs(x - np.pi)
+    x = np.pi - x
     return x
 
 def train(epochs):
     #for plotting cost per batch
     costs = []
+    movingavg_costs = []
     plt.ion()
-    fig = plt.figure(figsize=(15, 5))
-    ax = fig.add_subplot(131)
-    ax1 = fig.add_subplot(132)
-    ax2 = fig.add_subplot(133)
+    fig = plt.figure(figsize=(10, 5))
+    ax = fig.add_subplot(121)
+    ax1 = fig.add_subplot(122)
+    #ax2 = fig.add_subplot(133)
     ax.set_xlabel('Batch')
     ax.set_ylabel('Cost')
 
     ax1.set_xlabel('x')
     ax1.set_ylabel('y')
 
-    ax2.set_xlabel('Time')
-    ax2.set_ylabel('Amplitude')
+    #ax2.set_xlabel('Time')
+    #ax2.set_ylabel('Amplitude')
 
     plt.show()
 
@@ -210,9 +220,10 @@ def train(epochs):
             optimizer.step() #update parameters
 
             costs.append(cost.item())
+            movingavg_costs.append(np.mean(costs[-10:]))
             ax.plot(costs, 'b')
+            ax.plot(movingavg_costs, 'g')
             ax.set_ylim(0, 5)
-
             showind = np.random.randint(x.shape[0])
 
             rhophi1 = [5, y.detach().numpy()[showind, 0]]
@@ -228,13 +239,15 @@ def train(epochs):
             ax1.set_xlim(-10, 10)
             ax1.set_ylim(-10, 10)
 
-            ax2.clear()
-            ax2.plot(x.detach().numpy()[showind, 0, :], 'r')
-            ax2.plot(x.detach().numpy()[showind, 1, :], 'b')
+            #ax2.clear()
+            #ax2.plot(x.detach().numpy()[showind, 0, :], 'r')
+            #ax2.plot(x.detach().numpy()[showind, 1, :], 'b')
 
             fig.canvas.draw()
             plt.pause(0.00001)
-            print('Epoch', e, '\tBatch', i, '\tCost', cost.item())
+            print('Epoch', e, '\tBatch', i, '\tCost', cost.item(), '\tavgCost', movingavg_costs[-1])
+        if e+1%15==0:
+            torch.save(model.state_dict(), './trained_models/epoch'+str(e)+'.checkpoint')
 
     costs = np.array(costs)
     plt.close(fig)
