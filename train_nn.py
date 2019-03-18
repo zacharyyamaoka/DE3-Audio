@@ -14,11 +14,12 @@ sys.path.append(os.path.join(os.getcwd(), "utils"))
 from data_utils import *
 
 class AudioLocationDataset(Dataset):
-    def __init__(self, root="./../data_clip/", csv="./data_clip_label/label.csv", transform=None):
+    def __init__(self, root="./../data_clip/", csv="./data_clip_label/label.csv", transform=None, use_subset=None):
         self.root = root
         self.csv = pd.read_csv(csv)
-        self.filenames = self.csv['Filename'].tolist()
-        self.labels = self.csv['Label'].tolist()
+        if use_subset is not None:            
+            self.filenames = self.csv['Filename'].tolist()[:use_subset]
+            self.labels = self.csv['Label'].tolist()[:use_subset]
         self.transform = transform
 
     def __len__(self):
@@ -88,9 +89,9 @@ class AudioLocationNN(torch.nn.Module):
         x = self.dense2(x)
         return x
 
-data = AudioLocationDataset(transform = ToTensor())
+data = AudioLocationDataset(csv="./data_clip_label/label.csv", transform = ToTensor(), use_subset=30)
 
-batch_size = 32
+batch_size = 10
 
 train_samples = torch.utils.data.DataLoader(dataset=data,
                                               batch_size=batch_size,
@@ -100,11 +101,12 @@ sample_rate = 96000 #hertz
 label_rate = 10 #hertz
 chunk_size = 2048 #number of samples to feed to model
 
-lr = 0.0003 #learning rate
-regularization = 0#1e-4
+lr = 0.0001 #learning rate
+regularization = 1e-4
 epochs = 10 #number of epochs
 
 model = AudioLocationNN() #instantiate model
+model.load_state_dict(torch.load('./trained_models/30.checkpoint'))
 optimizer = torch.optim.Adam(model.parameters(), lr=lr) #optimizer
 
 def round_down(num, divisor):
@@ -184,3 +186,4 @@ def train(epochs):
 
 
 train(epochs)
+#torch.save(model.state_dict(), './trained_models/10.checkpoint')
