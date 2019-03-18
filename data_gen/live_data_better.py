@@ -21,9 +21,9 @@ from AudioLive import LivePlayer
 
 
 # N = 0
-file_count = 144 #enter nexts file num
+file_count = 2106 #enter nexts file num
 WINDOW_TIME = 2
-rec_min = 3
+rec_min = 10
 SAMPLE_RATE = 96000
 rec_time = rec_min * 60
 

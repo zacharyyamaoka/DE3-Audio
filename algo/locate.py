@@ -1,3 +1,4 @@
+import time
 import numpy as np
 import torch
 
@@ -26,16 +27,18 @@ class SoundLocalizer():
 
     def __init__(self):
         print("SoundLocalizer Init")
+        self.model = AudioLocationNN() #instantiate model
+        self.model.load_state_dict(torch.load('./../trained_models/40.checkpoint'))
 
     def locate(self, audio_vec):
-
+        audio_vec = audio_vec.T
+        # print("SHHAPE", audio_vec.shape)
         #PUT HAROONS CODE INTO HERE
-        model = AudioLocationNN() #instantiate model
-        model.load_state_dict(torch.load('./trained_models/40.checkpoint'))
-
         model_input=np.expand_dims(audio_vec, 0)
-        h = model.forward(model_input) #calculate hypothesis
+        h = self.model.forward(model_input) #calculate hypothesis
         theta = h.detach().numpy()[showind, 0]
+
+        # time.sleep(2)
 
         '''radius =  1
         re = audio_vec[0,:]
