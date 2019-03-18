@@ -11,8 +11,10 @@ def ala(audio_vec): # Main Computation
 
     pred_theta = Localizer.locate(audio_vec)
 
-    pred_var = 2*np.pi #180
+    pred_var = np.pi #180
 
     theta_mu, theta_var = KF.filter(pred_theta, pred_var)
+
+    theta_var = np.pi
 
     return theta_mu, theta_var

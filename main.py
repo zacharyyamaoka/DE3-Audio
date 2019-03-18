@@ -62,6 +62,7 @@ while True:
 
         if send_timer > 0.2:
             print("sending!", send_timer)
+            print("HHEADING: ", np.rad2deg(theta_mu))
             send_timer = 0
             #send Prediction to Sophie
             Sender.send_heading(np.rad2deg(theta_mu),np.rad2deg(theta_var))

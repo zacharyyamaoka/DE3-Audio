@@ -39,8 +39,10 @@ class SoundLocalizer():
         #PUT HAROONS CODE INTO HERE
         model_input=np.expand_dims(audio_vec, 0)
         model_input_tensor = torch.from_numpy(model_input)
+        model_input_tensor = torch.tensor(model_input_tensor,dtype=torch.float)
         h = self.model.forward(model_input_tensor) #calculate hypothesis
-        theta = h.detach().numpy()[showind, 0]
+        print(h)
+        theta = h.detach().numpy()[0, 0]
 
         # time.sleep(2)
 
