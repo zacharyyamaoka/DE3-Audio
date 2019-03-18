@@ -134,7 +134,7 @@ chunk_size = 2048 #number of samples to feed to model
 
 lr = 0.01*5 #learning rate
 regularization = 0
-epochs = 50 #number of epochs
+epochs = 22 #number of epochs
 
 
 def abs_radial_loss(h,y):
@@ -150,8 +150,8 @@ def abs_radial_loss(h,y):
     # x_ = x.detach().numpy()[showind, 0]
     # print("label: ", np.rad2deg(label), "pred: ", np.rad2deg(pred), "diff: ", np.rad2deg(x_))
     # time.sleep(3)
-    x = x * x #square difference
-    # x = torch.abs(x) # must be positive
+    # x = x * x #square difference
+    x = torch.abs(x) # must be positive
     x = torch.sum(x)
     x = x/batch_size
 
@@ -173,9 +173,17 @@ def radial_loss(h, y):
     return x
 
 def abs_radial_loss(h,y):
+    global batch_size
+    # h = torch.remainder(h, np.pi) #
     x = torch.abs(h.sub(y))
     x = torch.abs(x - np.pi)
     x = np.pi - x
+    x = x * x #square value
+
+    x = torch.sum(x) # average over batch
+    x = x / batch_size
+
+
     return x
 
 def train(epochs):
@@ -184,17 +192,17 @@ def train(epochs):
     movingavg_costs = []
     plt.ion()
     fig = plt.figure(figsize=(10, 5))
-    ax = fig.add_subplot(121)
-    ax1 = fig.add_subplot(122)
-    #ax2 = fig.add_subplot(133)
+    ax = fig.add_subplot(131)
+    ax1 = fig.add_subplot(132)
+    ax2 = fig.add_subplot(133)
     ax.set_xlabel('Batch')
     ax.set_ylabel('Cost')
 
     ax1.set_xlabel('x')
     ax1.set_ylabel('y')
 
-    #ax2.set_xlabel('Time')
-    #ax2.set_ylabel('Amplitude')
+    ax2.set_xlabel('Time')
+    ax2.set_ylabel('Amplitude')
 
     plt.show()
 
@@ -239,15 +247,15 @@ def train(epochs):
             ax1.set_xlim(-10, 10)
             ax1.set_ylim(-10, 10)
 
-            #ax2.clear()
-            #ax2.plot(x.detach().numpy()[showind, 0, :], 'r')
-            #ax2.plot(x.detach().numpy()[showind, 1, :], 'b')
+            ax2.clear()
+            ax2.plot(x.detach().numpy()[showind, 0, :], 'r')
+            ax2.plot(x.detach().numpy()[showind, 1, :], 'b')
 
             fig.canvas.draw()
             plt.pause(0.00001)
             print('Epoch', e, '\tBatch', i, '\tCost', cost.item(), '\tavgCost', movingavg_costs[-1])
-        if e+1%15==0:
-            torch.save(model.state_dict(), './trained_models/epoch'+str(e)+'.checkpoint')
+        # if e+1%15==0:
+            # torch.save(model.state_dict(), trained_model_path + 'epoch'+str(e)+'.checkpoint')
 
     costs = np.array(costs)
     plt.close(fig)

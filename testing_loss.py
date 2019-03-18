@@ -18,10 +18,17 @@ def radial_loss(h, y):
 
 def abs_radial_loss(h,y):
 
+    global batch_size
     # h = torch.remainder(h, np.pi)
     x = torch.abs(h.sub(y))
     x = torch.abs(x - np.pi)
     x = np.pi - x
+    x = x * x #square value
+
+    x = torch.sum(x) # average over batch
+    x = x / batch_size
+
+
     return x
 
 
