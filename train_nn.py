@@ -7,7 +7,7 @@ import glob
 import torch
 import torch.nn.functional as F
 from torch.utils.data import Dataset
-
+import time
 import os
 import sys
 sys.path.append(os.path.join(os.getcwd(), "utils"))
@@ -37,7 +37,27 @@ class AudioLocationDataset(Dataset):
         #label = np.expand_dims(label, 1)
 
         #cut so they are all the same length
-        audio = audio[:, :192512]  #26146890 for synthetic
+        # audio = audio[:, :192512]  #26146890 for synthetic
+
+        # Take random 0.1 sample
+        rate = 96000
+        dur = 0.005
+        chunk = int(rate*dur)
+
+        max_rand_ind = 192512 - chunk - 1
+        min_rand_ind = 0
+        start = int(np.random.uniform(min_rand_ind,max_rand_ind))
+        # print(start, start+chunk)
+        audio = audio[:, start:(start+chunk)]
+
+        #center data
+        mean = np.mean(audio)
+        audio -= mean
+
+        #normalize
+
+        max = np.max(np.abs(audio))
+        audio /= max
         #label = label[:5995, :] #59291 for synthetic
 
         if self.transform:
@@ -72,10 +92,15 @@ class AudioLocationNN(torch.nn.Module):
     def __init__(self):
         super().__init__()
         self.conv1 = torch.nn.Conv1d(2, 96, kernel_size=8, stride=4, padding=1)
+        # conv1.weight.data.fill_(0.01)
+        # The same applies for biases:
+        #
+        # conv1.bias.data.fill_(0.01)
         self.conv2 = torch.nn.Conv1d(96, 128, kernel_size=8, stride=4, padding=1)
         self.conv3 = torch.nn.Conv1d(128, 256, kernel_size=8, stride=4, padding=1)
         self.conv4 = torch.nn.Conv1d(256, 512, kernel_size=8, stride=4, padding=1)
-        self.dense1 = torch.nn.Linear(512*751, 500)
+        # self.dense1 = torch.nn.Linear(512*751, 500)
+        self.dense1 = torch.nn.Linear(512, 500)
         self.dense2 = torch.nn.Linear(500, 1)
 
         self.d = torch.nn.Dropout(p=0.5)
@@ -84,14 +109,16 @@ class AudioLocationNN(torch.nn.Module):
         x = F.relu(self.conv1(x))
         x = F.relu(self.conv2(x))
         x = F.relu(self.conv3(x))
-        x = F.relu(self.conv4(x)).view(-1, 512*751)
+        # x = F.relu(self.conv4(x)).view(-1, 512*751)
+        x = F.relu(self.conv4(x)).view(-1, 512)
         x = F.relu(self.dense1(x))
         x = self.dense2(x)
         return x
 
-data = AudioLocationDataset(csv="./data_clip_label/label.csv", transform = ToTensor(), use_subset=30)
+data = AudioLocationDataset(csv="./data_clip_label/label.csv", transform = ToTensor(), use_subset=2100)
+# data = AudioLocationDataset(csv="./data_clip_label/label.csv", transform = ToTensor())
 
-batch_size = 10
+batch_size = 128
 
 train_samples = torch.utils.data.DataLoader(dataset=data,
                                               batch_size=batch_size,
@@ -101,13 +128,37 @@ sample_rate = 96000 #hertz
 label_rate = 10 #hertz
 chunk_size = 2048 #number of samples to feed to model
 
-lr = 0.0001 #learning rate
-regularization = 1e-4
-epochs = 10 #number of epochs
+lr = 0.01 #learning rate
+regularization = 0
+epochs = 50 #number of epochs
 
+
+def abs_radial_loss(h,y):
+    global batch_size
+
+
+
+    x = torch.abs(h.sub(y))
+    x = torch.abs(x - np.pi)
+    x = np.pi - x
+    # print(x)
+    # showind = np.random.randint(x.shape[0])
+    # label = y.detach().numpy()[showind, 0]
+    # pred = h.detach().numpy()[showind, 0]
+    # x_ = x.detach().numpy()[showind, 0]
+    # print("label: ", np.rad2deg(label), "pred: ", np.rad2deg(pred), "diff: ", np.rad2deg(x_))
+    # time.sleep(3)
+    x = x * x #square difference
+    # x = torch.abs(x) # must be positive
+    x = torch.sum(x)
+    x = x/batch_size
+    return x
+
+trained_model_path = "/Users/zachyamaoka/Dropbox/de3_audio_data/trained_model/"
+model_version = 0
 model = AudioLocationNN() #instantiate model
-model.load_state_dict(torch.load('./trained_models/30.checkpoint'))
-optimizer = torch.optim.Adam(model.parameters(), lr=lr) #optimizer
+# model.load_state_dict(torch.load(trained_model_path + str(model_version) + ".checkpoint"))
+optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=regularization) #optimizer
 
 def round_down(num, divisor):
     return num - (num%divisor)
@@ -151,20 +202,22 @@ def train(epochs):
             h = model.forward(x) #calculate hypothesis
             print('Pred', h.detach().numpy(), '\nLabel', y.detach().numpy())
 
-            cost = F.mse_loss(h, y) #calculate cost
-
+            # cost = F.mse_loss(h, y) #calculate cost
+            cost = abs_radial_loss(h,y)
+            print("COST: ", cost)
             optimizer.zero_grad() #zero gradients
             cost.backward() # calculate derivatives of values of filters
             optimizer.step() #update parameters
 
             costs.append(cost.item())
             ax.plot(costs, 'b')
-            #ax.set_ylim(0, 100)
+            ax.set_ylim(0, 5)
 
             showind = np.random.randint(x.shape[0])
 
             rhophi1 = [5, y.detach().numpy()[showind, 0]]
             xy1 = toCartesian(rhophi1)
+            print("H:", h.detach().numpy())
             rhophi2 = [5, h.detach().numpy()[showind, 0]] #h.detach().numpy()[0, 0]
             #rhophi2[0] = np.min([abs(rhophi2[0]), 5])
             xy2 = toCartesian(rhophi2)
@@ -183,7 +236,25 @@ def train(epochs):
             plt.pause(0.00001)
             print('Epoch', e, '\tBatch', i, '\tCost', cost.item())
 
+    costs = np.array(costs)
+    plt.close(fig)
+    return np.min(costs)
 
 
-train(epochs)
-#torch.save(model.state_dict(), './trained_models/10.checkpoint')
+# learning_rate = 10 ** uniform(-6, 1)
+# learning_rate = [1.0,0.1,0.01,0.001,0.0001,0.00001,0.000001]
+# loss = []
+
+# for lr in learning_rate:
+#     model = AudioLocationNN() #instantiate model
+#     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=regularization) #optimizer
+min_cost = train(epochs)
+print("MIN COST: ", min_cost)
+#     loss.append(min_cost)
+
+
+
+model_version += epochs
+torch.save(model.state_dict(), trained_model_path + str(model_version) + ".checkpoint")
+# plt.plot(learning_rate,loss)
+# plt.pause(4)
