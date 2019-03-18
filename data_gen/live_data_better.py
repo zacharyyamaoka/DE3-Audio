@@ -21,6 +21,7 @@ from AudioLive import LivePlayer
 
 
 # N = 0
+# nbefore tunning 2106
 file_count = 2106 #enter nexts file num
 WINDOW_TIME = 2
 rec_min = 10

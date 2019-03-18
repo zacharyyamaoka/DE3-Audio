@@ -32,7 +32,7 @@ class AudioLocationDataset(Dataset):
     def __getitem__(self, idx):
         #audio, label, rates = load_data_file(n=idx, audio_n_offset=0, label_rate=10, file_stem="real_rec_", data_label_path = "./data_real_label/", data_wav_path = "./../data_real_wav/")
         fname = self.filenames[idx]
-        label = [self.labels[idx]]
+        label = self.labels[idx]
         path = self.root + fname
         audio, sample_rate = librosa.core.load(path, sr=96000, mono=False)
         #print(audio.shape)
@@ -63,7 +63,10 @@ class AudioLocationDataset(Dataset):
         max = np.max(np.abs(audio))
         audio /= max
         #label = label[:5995, :] #59291 for synthetic
-
+        if label<np.pi:
+            label=[0]
+        else:
+            label=[1]
         if self.transform:
             audio, label = self.transform((audio, label))
 
@@ -90,7 +93,7 @@ class ToTensor():
 
     def __call__(self, sample):
         a, l = sample
-        return torch.Tensor(a), torch.Tensor(l)
+        return torch.Tensor(a), torch.LongTensor(l)
 
 class AudioLocationNN(torch.nn.Module):
     def __init__(self):
@@ -105,7 +108,7 @@ class AudioLocationNN(torch.nn.Module):
         self.conv4 = torch.nn.Conv1d(256, 512, kernel_size=8, stride=4, padding=1)
         # self.dense1 = torch.nn.Linear(512*751, 500)
         self.dense1 = torch.nn.Linear(512, 500)
-        self.dense2 = torch.nn.Linear(500, 1)
+        self.dense2 = torch.nn.Linear(500, 2)
 
         self.d = torch.nn.Dropout(p=0.5)
 
@@ -116,11 +119,12 @@ class AudioLocationNN(torch.nn.Module):
         # x = F.relu(self.conv4(x)).view(-1, 512*751)
         x = F.relu(self.conv4(x)).view(-1, 512)
         x = F.relu(self.dense1(x))
-        x = self.dense2(x)
+        x = F.softmax(self.dense2(x))
         return x
 
-data = AudioLocationDataset(csv="./data_clip_label/label.csv", transform = ToTensor(), use_subset=2100)
+data = AudioLocationDataset(csv="./data_clip_label/label.csv", transform = ToTensor(), use_subset=294)
 # data = AudioLocationDataset(csv="./data_clip_label/label.csv", transform = ToTensor())
+data = AudioLocationDataset(csv="./data_clip_label/label_full_mon.csv", transform = ToTensor(), use_subset=None)
 
 batch_size = 128
 
@@ -132,9 +136,10 @@ sample_rate = 96000 #hertz
 label_rate = 10 #hertz
 chunk_size = 2048 #number of samples to feed to model
 
-lr = 0.01*5 #learning rate
+lr = 0.0003 #learning rate
 regularization = 0
 epochs = 22 #number of epochs
+model_version = 176
 
 
 def abs_radial_loss(h,y):
@@ -158,9 +163,8 @@ def abs_radial_loss(h,y):
     return x
 
 trained_model_path = "/Users/zachyamaoka/Dropbox/de3_audio_data/trained_model/"
-model_version = 0
 model = AudioLocationNN() #instantiate model
-# model.load_state_dict(torch.load(trained_model_path + str(model_version) + ".checkpoint"))
+#model.load_state_dict(torch.load(trained_model_path + str(model_version) + ".checkpoint"))
 optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=regularization) #optimizer
 
 def round_down(num, divisor):
@@ -172,16 +176,16 @@ def radial_loss(h, y):
     x = torch.mean(x)
     return x
 
-def abs_radial_loss(h,y):
-    global batch_size
-    # h = torch.remainder(h, np.pi) #
-    x = torch.abs(h.sub(y))
-    x = torch.abs(x - np.pi)
-    x = np.pi - x
-    x = x * x #square value
-
-    x = torch.sum(x) # average over batch
-    x = x / batch_size
+# def abs_radial_loss(h,y):
+#     global batch_size
+#     # h = torch.remainder(h, np.pi) #
+#     x = torch.abs(h.sub(y))
+#     x = torch.abs(x - np.pi)
+#     x = np.pi - x
+#     x = x * x #square value
+#
+#     x = torch.sum(x) # average over batch
+#     x = x / batch_size
 
 
     return x
@@ -221,7 +225,8 @@ def train(epochs):
             print('Pred', h.detach().numpy(), '\nLabel', y.detach().numpy())
 
             # cost = F.mse_loss(h, y) #calculate cost
-            cost = abs_radial_loss(h,y)
+            #cost = abs_radial_loss(h,y)
+            cost = F.cross_entropy(h, y.squeeze())
             print("COST: ", cost)
             optimizer.zero_grad() #zero gradients
             cost.backward() # calculate derivatives of values of filters
@@ -231,13 +236,20 @@ def train(epochs):
             movingavg_costs.append(np.mean(costs[-10:]))
             ax.plot(costs, 'b')
             ax.plot(movingavg_costs, 'g')
-            ax.set_ylim(0, 5)
+            #ax.set_ylim(0, 5)
             showind = np.random.randint(x.shape[0])
 
-            rhophi1 = [5, y.detach().numpy()[showind, 0]]
+            if y.detach().numpy()[showind, 0]==0:
+                rhophi1 = [5, np.pi/2]
+            else:
+                rhophi1 = [5, 1.5*np.pi]
             xy1 = toCartesian(rhophi1)
-            print("H:", h.detach().numpy())
-            rhophi2 = [5, h.detach().numpy()[showind, 0]] #h.detach().numpy()[0, 0]
+            # print("H:", h.detach().numpy())
+            if np.argmax(h.detach().numpy()[showind]) ==0:
+                rhophi2 = [5, np.pi/2]
+            else:
+                rhophi2 = [5, 1.5*np.pi]
+            #
             #rhophi2[0] = np.min([abs(rhophi2[0]), 5])
             xy2 = toCartesian(rhophi2)
             ax1.clear()

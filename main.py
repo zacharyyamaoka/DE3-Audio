@@ -15,10 +15,11 @@ room_width = 5
 room_length = 5
 
 SAMPLE_RATE = 96000
-CHUNK_SIZE = 192512
-WINDOW_TIME = CHUNK_SIZE/float(SAMPLE_RATE)
+# CHUNK_SIZE = 192512
+WINDOW_TIME = 0.005
+CHUNK_SIZE = int(SAMPLE_RATE*WINDOW_TIME)
 
-# Sender = DataSender(ip="146.169.222.244", port=7400)
+# Sender = DataSender(ip="146.169.220.251", port=7400)
 Sender = DataSender(port=7400)
 
 Player = LivePlayer(window = WINDOW_TIME, sample_rate=SAMPLE_RATE, playback=True)
@@ -61,10 +62,13 @@ while True:
         print(theta_mu,theta_var)
 
         if send_timer > 0.2:
+            time.sleep(1)
             print("sending!", send_timer)
             print("HHEADING: ", np.rad2deg(theta_mu))
             send_timer = 0
             #send Prediction to Sophie
-            Sender.send_heading(np.rad2deg(theta_mu),np.rad2deg(theta_var))
+            print("thehta mu")
+            print(theta_mu)
+            Sender.send_heading(float(np.rad2deg(theta_mu)),np.rad2deg(theta_var))
     else:
         continue # still waiting for data
