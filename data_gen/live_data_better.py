@@ -21,9 +21,9 @@ from AudioLive import LivePlayer
 
 
 # N = 0
-file_count = 0 #enter nexts file num
+file_count = 2106 #enter nexts file num
 WINDOW_TIME = 2
-rec_min = 3
+rec_min = 10
 SAMPLE_RATE = 96000
 rec_time = rec_min * 60
 
@@ -32,7 +32,7 @@ wav = WavWriter(path="/Users/zachyamaoka/Dropbox/de3_audio_data/data_clip/", rat
 Walker = RandomPolarWalker(rec_time)
 Viz = Debugger()
 # file = BatchLabel(name="label_"+str(N),path="/Users/zachyamaoka/Documents/de3_audio/data_clip_label/")
-file = BatchLabel(name="label_piano",path="/Users/zachyamaoka/Documents/de3_audio/data_clip_label/")
+file = BatchLabel(name="label",path="/Users/zachyamaoka/Documents/de3_audio/data_clip_label/")
 
 #MAKE SURE TO CHANGE THE FILE NUMBER
 
@@ -86,13 +86,13 @@ while time_running < rec_time:
         print("Saving Files: time stamp ", time_running)
         data = Player.get_sample_rec()
         # print(data)
-        wav.save_wav("clip_piano"+str(file_count), data)
+        wav.save_wav("clip"+str(file_count), data)
 
         theta = Walker.heading()
         Walker.slow_update(WINDOW_TIME)
         Viz.draw_heading(theta,show = True)
 
-        file.write("clip_piano"+str(file_count)+".wav", theta)
+        file.write("clip"+str(file_count)+".wav", theta)
         file_count += 1
     #
     # if draw_time >= draw_period:
