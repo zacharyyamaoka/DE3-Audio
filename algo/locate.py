@@ -1,12 +1,16 @@
 import numpy as np
+import time
 class SoundLocalizer():
 
     def __init__(self):
         print("SoundLocalizer Init")
 
     def locate(self, audio_vec):
-
+        # print("SHHAPE", audio_vec.shape)
         #PUT HAROONS CODE INTO HERE
+        audio_vec = audio_vec.T
+
+        # time.sleep(2)
 
         radius =  1
         re = audio_vec[0,:]

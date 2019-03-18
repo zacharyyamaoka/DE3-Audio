@@ -12,8 +12,9 @@ class LivePlayer():
         self.FORMAT = self.p.get_format_from_width(self.WIDTH)
         self.CHANNELS = 2
         self.RATE = sample_rate
+        self.buffer_len = int(round(sample_rate*window))
+        print("buff rate: ", self.buffer_len)
 
-        self.buffer_len = int(sample_rate*window)
         # self.frames = deque(maxlen = self.buffer_len)
         self.frames = []
         self.frame_count = 0
