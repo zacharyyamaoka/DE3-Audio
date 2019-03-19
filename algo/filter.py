@@ -13,7 +13,7 @@ class PositionFilter():
     def filter(self, last_theta_mu, last_theta_var):
 
         # simple moving average filter.
-
+        last_theta_mu = last_theta_mu % (2 * np.pi) #modulo
         self.theta_mu[self.pointer] = last_theta_mu
         self.theta_var[self.pointer] = last_theta_var
         #print(self.r_a)

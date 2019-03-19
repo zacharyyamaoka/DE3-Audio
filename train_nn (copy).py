@@ -93,9 +93,9 @@ class AudioLocationNN(torch.nn.Module):
         x = self.dense2(x)
         return x
 
-data = AudioLocationDataset(use_subset=180, csv="./data_clip_label/label.csv", transform = ToTensor())
+data = AudioLocationDataset(use_subset=None, csv="./data_clip_label/label.csv", transform = ToTensor())
 
-batch_size = 10
+batch_size = 32
 
 train_samples = torch.utils.data.DataLoader(dataset=data,
                                               batch_size=batch_size,
@@ -110,8 +110,8 @@ regularization = 3e-5
 epochs = 50000 #number of epochs
 
 model = AudioLocationNN() #instantiate model
-model.load_state_dict(torch.load('./trained_models/120.checkpoint'))
-optimizer = torch.optim.Adam(model.parameters(), lr=lr) #optimizer
+model.load_state_dict(torch.load('./trained_models/all.checkpoint'))
+optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=regularization) #optimizer
 
 def round_down(num, divisor):
     return num - (num%divisor)
