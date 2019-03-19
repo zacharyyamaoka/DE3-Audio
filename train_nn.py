@@ -212,29 +212,32 @@ def radial_loss(h, y):
     #return x
 
 def train(epochs):
+    lr = 0.003 if epochs<1 else 0.00003
+    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=regularization) #optimizer
+
     model.train()
     #for plotting cost per batch
     costs = []
     movingavg_costs = []
     plt.ion()
     fig = plt.figure(figsize=(10, 5))
-    ax = fig.add_subplot(131)
-    ax1 = fig.add_subplot(132)
-    ax2 = fig.add_subplot(133)
+    ax = fig.add_subplot(121)
+    ax1 = fig.add_subplot(122)
+    #ax2 = fig.add_subplot(133)
     ax.set_xlabel('Batch')
     ax.set_ylabel('Cost')
 
     ax1.set_xlabel('x')
     ax1.set_ylabel('y')
 
-    ax2.set_xlabel('Time')
-    ax2.set_ylabel('Amplitude')
+    #ax2.set_xlabel('Time')
+    #ax2.set_ylabel('Amplitude')
 
     plt.show()
 
     for e in range(epochs):
         for i, (x, y) in enumerate(train_samples):
-            print('Audio shape', x.shape, 'Label shape', y.shape)
+            #print('Audio shape', x.shape, 'Label shape', y.shape)
             #start_ind = np.random.randint(0, xb.shape[2]-chunk_size)
             #end_ind = start_ind+chunk_size
             #x = xb[:, :, start_ind:end_ind]
@@ -244,12 +247,12 @@ def train(epochs):
             #ylabel = y[:, 1].unsqueeze(dim=0).transpose(0, 1)
 
             h = model.forward(x) #calculate hypothesis
-            print('H', h.detach().numpy(), '\nLabel', y.detach().numpy())
+            #print('H', h.detach().numpy(), '\nLabel', y.detach().numpy())
 
             # cost = F.mse_loss(h, y) #calculate cost
             #cost = abs_radial_loss(h,y)
             cost = F.cross_entropy(h, y.squeeze())
-            print("COST: ", cost)
+            #print("COST: ", cost)
             optimizer.zero_grad() #zero gradients
             cost.backward() # calculate derivatives of values of filters
             optimizer.step() #update parameters
@@ -280,9 +283,9 @@ def train(epochs):
             ax1.set_xlim(-10, 10)
             ax1.set_ylim(-10, 10)
 
-            ax2.clear()
-            ax2.plot(x.detach().numpy()[showind, 0, :], 'r')
-            ax2.plot(x.detach().numpy()[showind, 1, :], 'b')
+            #ax2.clear()
+            #ax2.plot(x.detach().numpy()[showind, 0, :], 'r')
+            #ax2.plot(x.detach().numpy()[showind, 1, :], 'b')
 
             fig.canvas.draw()
             plt.pause(0.00001)
@@ -294,18 +297,17 @@ def train(epochs):
     plt.close(fig)
     return np.min(costs)
 
-def test():
+def test(samples):
     model.eval()
     correct=0
-    for i, (x, y) in enumerate(test_samples):
-        print('Audio shape', x.shape, 'Label shape', y.shape)
-
+    for i, (x, y) in enumerate(samples):
         h = model.forward(x) #calculate hypothesis
         pred = np.argmax(h.detach().numpy(), axis=1)
         y = y.detach().numpy().squeeze()
         c =np.sum(np.equal(pred, y))
         correct+=c
-    acc = correct/len(test_data)
+        print('.')
+    acc = correct/len(samples.dataset)
     return acc
 
 # learning_rate = 10 ** uniform(-6, 1)
@@ -319,7 +321,7 @@ min_cost = train(epochs)
 print("MIN COST: ", min_cost)
 #     loss.append(min_cost)
 
-accuracy = test()
+accuracy = test(test_samples)
 print('Test accuracy', accuracy)
 
 
