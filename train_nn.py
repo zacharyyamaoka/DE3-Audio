@@ -18,19 +18,23 @@ import sys
 
 sys.path.append(os.path.join(os.getcwd(), "nn_utils"))
 
+#Our imports
 from nn_util import *
 from models import *
 
-#data = AudioLocationDataset(csv="./data_clip_label/label.csv", transform = ToTensor(), use_subset=2100)
-# data = AudioLocationDataset(csv="./data_clip_label/label.csv", transform = ToTensor())
+#train_test_val_split()
+
 train_data = AudioLocationDataset(csv="./data_clip_label/label_train.csv", transform = ToTensor(), use_subset=None)
+val_data = AudioLocationDataset(csv="./data_clip_label/label_val.csv", transform = ToTensor(), use_subset=None)
 test_data = AudioLocationDataset(csv="./data_clip_label/label_test.csv", transform = ToTensor(), use_subset=None)
 
 batch_size = 128
 
 train_samples = torch.utils.data.DataLoader(dataset=train_data,
                                               batch_size=batch_size,
-                                              shuffle=True)
+
+val_samples = torch.utils.data.DataLoader(dataset=val_data,
+                                              batch_size=batch_size)                                              shuffle=True)
 
 test_samples = torch.utils.data.DataLoader(dataset=test_data,
                                               batch_size=batch_size)
