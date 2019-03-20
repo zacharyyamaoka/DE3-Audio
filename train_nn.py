@@ -23,7 +23,7 @@ from models import *
 
 
 # PARAMETERS
-BIN_N = 2
+BIN_N = 4
 sample_rate = 96000 #hertz
 label_rate = 10 #hertz
 chunk_size = 2048 #number of samples to feed to model
@@ -50,7 +50,7 @@ test_samples = torch.utils.data.DataLoader(dataset=test_data,
 
 trained_model_path = "./trained_models/"
 #trained_model_path = "/Users/zachyamaoka/Dropbox/de3_audio_data/trained_model/"
-model = AudioLocationNN() #instantiate model
+model = AudioLocationNN(BIN_N) #instantiate model
 #model.load_state_dict(torch.load(trained_model_path + str(model_version) + ".checkpoint"))
 optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=regularization) #optimizer
 
@@ -100,10 +100,12 @@ def train(epochs):
             #     rhophi1 = [5, np.pi/2]
             # else:
             #     rhophi1 = [5, 1.5*np.pi]
-
+            print(h.detach().numpy())
             pred_label = np.argmax(h.detach().numpy()[showind])
+            pred_actual = y.detach().numpy()[showind]
+
             theta_pred = get_theta_quad(pred_label, BIN_N)
-            theta_actual = get_theta_quad(y.squeeze(), BIN_N)
+            theta_actual = get_theta_quad(pred_actual, BIN_N)
 
             rhophi1 = [5, theta_pred]
             rhophi2 = [5, theta_actual]

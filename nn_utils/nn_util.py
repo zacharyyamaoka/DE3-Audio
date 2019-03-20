@@ -67,6 +67,7 @@ class AudioLocationDataset(Dataset):
 
         label = segment_data(label,self.bins) # convert from theta to bin
 
+        label = [label]
         if self.transform:
             audio, label = self.transform((audio, label))
 
@@ -174,9 +175,9 @@ def get_theta_quad(pred, n): #Rounds to center of quadrant
             return 1.5 * np.pi
 
     else:
-        step = 2 * np.pi/n
+        step = 2 * np.pi/ n
 
-        return n * step
+        return (pred+1)* step
     #floors theta based on the number of bins
 
 
