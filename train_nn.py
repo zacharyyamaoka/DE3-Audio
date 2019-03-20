@@ -36,6 +36,9 @@ model_version = 0
 
 #data = AudioLocationDataset(csv="./data_clip_label/label.csv", transform = ToTensor(), use_subset=2100)
 # data = AudioLocationDataset(csv="./data_clip_label/label.csv", transform = ToTensor())
+train_test_val_split(csv="./data_clip_label/label.csv", save_loc='./data_clip_label/')
+# train_test_val_split(csv="./data_clip_label/label.csv", save_loc='./data_clip_label/')
+
 train_data = AudioLocationDataset(csv="./data_clip_label/label_train.csv", transform = ToTensor(), use_subset=None, num_bin=BIN_N)
 test_data = AudioLocationDataset(csv="./data_clip_label/label_test.csv", transform = ToTensor(), use_subset=None, num_bin=BIN_N)
 
