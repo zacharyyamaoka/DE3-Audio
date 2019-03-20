@@ -87,7 +87,7 @@ def toCartesian(rhophi):
     y = rho * np.sin(phi)
     return(x, y)
 
-def test_train_split(csv="./data_clip_label/label_OG.csv", save_loc='./data_clip_label/'):
+def train_test_val_split(csv="./data_clip_label/label.csv", save_loc='./data_clip_label/'):
     csv = pd.read_csv(csv)
     filenames = csv['Filename'].tolist()
     labels = csv['Label'].tolist()
@@ -95,12 +95,16 @@ def test_train_split(csv="./data_clip_label/label_OG.csv", save_loc='./data_clip
     all_i = np.random.choice(all_i, len(all_i), replace=False)
 
     train=csv.sample(frac=0.8)
-    test=csv.drop(train.index)
+    testval=csv.drop(train.index)
+    val=testval.sample(frac=0.5)
+    test=testval.drop(val.index)
 
     print(type(train), '\n', train.head(), '\n len', len(train))
+    print(type(val), '\n', val.head(), '\n len', len(val))
     print(type(test), '\n', test.head(), '\n len', len(test))
 
     train.to_csv(save_loc+"label_train.csv", index=False)
+    test.to_csv(save_loc+"label_val.csv", index=False)
     test.to_csv(save_loc+"label_test.csv", index=False)
 
 class ToTensor():
