@@ -21,20 +21,9 @@ sys.path.append(os.path.join(os.getcwd(), "nn_utils"))
 from nn_util import *
 from models import *
 
-#data = AudioLocationDataset(csv="./data_clip_label/label.csv", transform = ToTensor(), use_subset=2100)
-# data = AudioLocationDataset(csv="./data_clip_label/label.csv", transform = ToTensor())
-train_data = AudioLocationDataset(csv="./data_clip_label/label_train.csv", transform = ToTensor(), use_subset=None)
-test_data = AudioLocationDataset(csv="./data_clip_label/label_test.csv", transform = ToTensor(), use_subset=None)
 
-batch_size = 128
-
-train_samples = torch.utils.data.DataLoader(dataset=train_data,
-                                              batch_size=batch_size,
-                                              shuffle=True)
-
-test_samples = torch.utils.data.DataLoader(dataset=test_data,
-                                              batch_size=batch_size)
-
+# PARAMETERS
+BIN_N = 2
 sample_rate = 96000 #hertz
 label_rate = 10 #hertz
 chunk_size = 2048 #number of samples to feed to model
@@ -45,6 +34,19 @@ epochs = 50 #number of epochs
 model_version = 0
 
 
+#data = AudioLocationDataset(csv="./data_clip_label/label.csv", transform = ToTensor(), use_subset=2100)
+# data = AudioLocationDataset(csv="./data_clip_label/label.csv", transform = ToTensor())
+train_data = AudioLocationDataset(csv="./data_clip_label/label_train.csv", transform = ToTensor(), use_subset=None, num_bin=BIN_N)
+test_data = AudioLocationDataset(csv="./data_clip_label/label_test.csv", transform = ToTensor(), use_subset=None, num_bin=BIN_N)
+
+batch_size = 128
+
+train_samples = torch.utils.data.DataLoader(dataset=train_data,
+                                              batch_size=batch_size,
+                                              shuffle=True)
+
+test_samples = torch.utils.data.DataLoader(dataset=test_data,
+                                              batch_size=batch_size)
 
 trained_model_path = "./trained_models/"
 #trained_model_path = "/Users/zachyamaoka/Dropbox/de3_audio_data/trained_model/"
@@ -78,22 +80,11 @@ def train(epochs):
 
     for e in range(epochs):
         for i, (x, y) in enumerate(train_samples):
-            #print('Audio shape', x.shape, 'Label shape', y.shape)
-            #start_ind = np.random.randint(0, xb.shape[2]-chunk_size)
-            #end_ind = start_ind+chunk_size
-            #x = xb[:, :, start_ind:end_ind]
-            #print(x.shape)
-            #label_ind = sample2labelId(end_ind, sample_rate, label_rate)
-            #y = yb[:, label_ind , :]
-            #ylabel = y[:, 1].unsqueeze(dim=0).transpose(0, 1)
 
             h = model.forward(x) #calculate hypothesis
-            #print('H', h.detach().numpy(), '\nLabel', y.detach().numpy())
 
-            # cost = F.mse_loss(h, y) #calculate cost
-            #cost = abs_radial_loss(h,y)
             cost = F.cross_entropy(h, y.squeeze())
-            #print("COST: ", cost)
+
             optimizer.zero_grad() #zero gradients
             cost.backward() # calculate derivatives of values of filters
             optimizer.step() #update parameters
@@ -105,18 +96,21 @@ def train(epochs):
             #ax.set_ylim(0, 5)
             showind = np.random.randint(x.shape[0])
 
-            if y.detach().numpy()[showind, 0]==0:
-                rhophi1 = [5, np.pi/2]
-            else:
-                rhophi1 = [5, 1.5*np.pi]
+            # if y.detach().numpy()[showind, 0]==0:
+            #     rhophi1 = [5, np.pi/2]
+            # else:
+            #     rhophi1 = [5, 1.5*np.pi]
+
+            pred_label = np.argmax(h.detach().numpy()[showind])
+            theta_pred = get_theta_quad(pred_label, BIN_N)
+            theta_actual = get_theta_quad(y.squeeze(), BIN_N)
+
+            rhophi1 = [5, theta_pred]
+            rhophi2 = [5, theta_actual]
+
             xy1 = toCartesian(rhophi1)
-            # print("H:", h.detach().numpy())
-            if np.argmax(h.detach().numpy()[showind]) ==0:
-                rhophi2 = [5, np.pi/2]
-            else:
-                rhophi2 = [5, 1.5*np.pi]
-            #rhophi2[0] = np.min([abs(rhophi2[0]), 5])
             xy2 = toCartesian(rhophi2)
+
             ax1.clear()
             ax1.scatter(np.expand_dims(xy1[0], 0), np.expand_dims(xy1[1], 0), c='g')
             ax1.scatter(np.expand_dims(xy2[0], 0), np.expand_dims(xy2[1], 0), c='b')
