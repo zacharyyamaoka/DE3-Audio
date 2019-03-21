@@ -9,7 +9,7 @@ import torch
 
 
 class AudioLocationDataset(Dataset):
-    def __init__(self, root="./../data_clip/", csv="./data_clip_label/label.csv", transform=None, use_subset=None):
+    def __init__(self, root="./../data_clip/", csv="./data_clip_label/label.csv", transform=None, use_subset=None, num_bin = 2):
         self.root = root
         self.csv = pd.read_csv(csv)
         if use_subset is not None:
@@ -20,6 +20,8 @@ class AudioLocationDataset(Dataset):
             self.labels = self.csv['Label'].tolist()
 
         self.transform = transform
+        self.num_bin = num_bin
+        self.bins = get_bins(self.num_bin)
 
     def __len__(self):
         return len(self.filenames)
@@ -30,6 +32,7 @@ class AudioLocationDataset(Dataset):
         label = self.labels[idx]
         path = self.root + fname
         audio, sample_rate = librosa.core.load(path, sr=96000, mono=False)
+        #print(audio[:, :5])
         #print(audio.shape)
         #print([label])
         #label = label[:, :2]
@@ -58,10 +61,14 @@ class AudioLocationDataset(Dataset):
         max = np.max(np.abs(audio))
         audio /= max
         #label = label[:5995, :] #59291 for synthetic
-        if label<np.pi:
-            label=[0]
-        else:
-            label=[1]
+        # if label<np.pi:
+        #     label=[0]
+        # else:
+        #     label=[1]
+
+        label = segment_data(label,self.bins) # convert from theta to bin
+
+        label = [label]
         if self.transform:
             audio, label = self.transform((audio, label))
 
@@ -163,11 +170,22 @@ def get_bins(n):
 
     return bins
 
-def get_theta_quad(theta, n): #Rounds to center of quadrant
+def get_theta_quad(pred, n): #Rounds to center of quadrant
+    """Coverts a pred label to theta value based on the number of quadrants"""
 
+    if n == 2: #special case
+        if pred == 0:
+            return np.pi/2
+        else:
+            return 1.5 * np.pi
+
+    else:
+        step = 2 * np.pi/ n
+
+        return (pred+1)* step
     #floors theta based on the number of bins
 
-    
+
 
 
 def segment_data(theta,bins):

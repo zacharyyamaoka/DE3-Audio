@@ -8,6 +8,10 @@ import numpy as np
 from nn_util import *
 
 class TestMain(unittest.TestCase):
+    def test_get_theta_quad(self):
+
+        self.assertEqual(get_theta_quad(0, 4),np.pi/2)
+        self.assertEqual(get_theta_quad(3, 4)%(2*np.pi),0)
 
     def test_get_bins(self):
 
