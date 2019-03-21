@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 class ALA():
 
-    def __init__(self, res=10):
+    def __init__(self, res=20):
 
         self.Localizer = SoundLocalizer()
         self.DBF = PositionFilter(res)
@@ -32,7 +32,7 @@ class ALA():
 
         return self.DBF.get_peak(), self.measure_var  #return max of distrbution and pre set variance
 
-    def get_belief(self):
+    def get_bel(self):
         return self.DBF.bel
     def get_bin_n(self):
         return self.DBF.n

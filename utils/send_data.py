@@ -18,6 +18,10 @@ class DataSender():
         """Send x y positon to Sophie's computer to be displayed on projector"""
         self.client.send_message("/filter", (x,y))
 
+    def send_bel(self, bel):
+        bel = tuple(bel)
+        self.client.send_message("/heading", bel)
+
     def send_heading(self, theta, var):
         """Send x y positon to Sophie's computer to be displayed on projector"""
         self.client.send_message("/heading", (theta,var))

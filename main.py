@@ -91,7 +91,7 @@ while True:
         #for viz purposes move to pi to =pi
         ax4.clear()
         ax4.set_ylim(0,1)
-        plt.scatter(theta_new,ALA.get_belief())
+        plt.scatter(theta_new,ALA.get_bel())
 
         # center theta_mu
 
@@ -105,9 +105,10 @@ while True:
     # print(theta_mu, theta_var)
     #if very uncertain then you can have a massive variance that covers the entire circle
 
-    # if send_timer > 0.2: #every x seconds send your best estimate of theta_mu and theta_var
-    #     send_timer = 0
-    #     #send Prediction to Sophie
-    #     Sender.send_heading(float(np.rad2deg(theta_mu)),np.rad2deg(theta_var))
+    if send_timer > 0.2: #every x seconds send your best estimate of theta_mu and theta_var
+        send_timer = 0
+        #send Prediction to Sophie
+        Sender.send_bel(ALA.get_bel())
+        # Sender.send_heading(float(np.rad2deg(theta_mu)),np.rad2deg(theta_var))
 
     continue

@@ -106,6 +106,10 @@ class SoundLocalizer():
         else:
             theta = 1.5*np.pi
 
-        # theta = np.pi/2
+        if np.random.random() > 0.75:
+            theta = np.pi/2
+        else:
+            theta = 1.5*np.pi
+
         confidence = 1
         return theta, confidence
