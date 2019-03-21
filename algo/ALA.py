@@ -2,32 +2,37 @@
 from locate import SoundLocalizer
 from filter import PositionFilter
 import numpy as np
+import matplotlib.pyplot as plt
 # Audio Localization Algorithm
 
-Localizer = SoundLocalizer()
-KF = PositionFilter()
 
-def ala(audio_vec): # Main Computation
 
-    pred_theta = Localizer.locate(audio_vec)
-# pred_theta
-    pred_var = np.pi #180
+class ALA():
 
-    theta_mu, theta_var = KF.filter(pred_theta, pred_var)
+    def __init__(self, res=10):
 
-    # theta_var = np.pi/2
-    theta_var = np.pi
+        self.Localizer = SoundLocalizer()
+        self.DBF = PositionFilter(res)
+        self.measure_var = np.pi #based on localization bin size - we just do left right
 
-    pred_theta = pred_theta % (2*np.pi)
-    print("Pred Thheta: ", pred_theta)
 
-    if pred_theta > 0 and pred_theta < np.pi:
-        theta_mu = np.pi/2
+    def update(self, dt=0.1): #must call this each loop
+        self.DBF.motion_update(dt)
 
-    if pred_theta <= 0 and pred_theta > -np.pi:
-        theta_mu = -np.pi/2
+    def new_reading(self, audio_vec): # Use CNN to locate sound, assume measurement variance here
+        theta_mu, confidence = self.Localizer.locate(audio_vec) #Localize sound
+        var = self.measure_var #
 
-    if pred_theta > np.pi and pred_theta <= 2*np.pi:
-        theta_mu = -np.pi/2
+        if confidence > 0: #outlier rejection
+            self.DBF.sensor_update(theta_mu, var)
 
-    return theta_mu, theta_var
+    def get_best_estimate(self): # Main Computation
+
+        return self.DBF.get_peak(), self.measure_var  #return max of distrbution and pre set variance
+
+    def get_belief(self):
+        return self.DBF.bel
+    def get_bin_n(self):
+        return self.DBF.n
+    def get_step(self):
+        return self.DBF.step
