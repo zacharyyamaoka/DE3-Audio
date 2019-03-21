@@ -55,6 +55,8 @@ while True:
     counter += 1
     # Player.stream_audio(live=True, playback=True)
 
+    Head.look_around()
+
     #TODO TUNE drift parameter
     ALA.update(dt) #call each loop
     #
@@ -68,7 +70,8 @@ while True:
         #TODO make it so it just gets the most recent one
         data_vec = data_vec[:CHUNK_SIZE]
 
-        ALA.new_reading(data_vec) #update belief
+        head_yaw = Head.get_rotation()
+        ALA.new_reading(data_vec, head_yaw) #update belief
 
 
     theta_mu, theta_var = ALA.get_best_estimate() #get the best estimate of where the source is each time stamp
@@ -76,10 +79,26 @@ while True:
 
     if VIZ:
         theta = np.arange(ALA.get_bin_n()) * ALA.get_step()
+        theta += ALA.get_step()/2 #center
+        theta_new = []
+
+        for w in theta:
+            if w > np.pi: #wrap back
+                w = w - (2*np.pi)
+
+            theta_new.append(w)
+
+        #for viz purposes move to pi to =pi
         ax4.clear()
         ax4.set_ylim(0,1)
-        plt.scatter(theta,ALA.get_belief())
+        plt.scatter(theta_new,ALA.get_belief())
+
+        # center theta_mu
+
+        if theta_mu > np.pi: #wrap back
+            theta_mu = theta_mu - (2*np.pi)
         plt.scatter(theta_mu,0.8, s=40, c='b', marker='o')
+
         plt.show()
         plt.pause(0.01)
 

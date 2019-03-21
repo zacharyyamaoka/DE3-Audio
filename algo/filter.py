@@ -86,6 +86,14 @@ class PositionFilter():
         self.bel = new_bel
         print("Motion Update")
 
+    def eval_HRTF(self, x,theta_mu,var):
+        # more binary
+        d = self.angle_delta(x,theta_mu)
+        if d < var/2:
+            return 0.5
+        else:
+            return 0.1
+
     def sensor_update(self, theta_mu, var=np.pi): #update with sensor reading and accuracy
 
         new_bel = np.zeros(self.n)
@@ -93,7 +101,9 @@ class PositionFilter():
         for i in np.arange(self.n): #for each bin update with likelihood of measurement
             # x = (self.step * (i - 1)) + self.step/2 #find the center of the bin
             x = self.bin_ind_2_theta(i) #find the center of the bin
-            likelihood = self.eval_gaussian(x,theta_mu,var)
+
+            # likelihood = self.eval_gaussian(x,theta_mu,var)
+            likelihood = self.eval_HRTF(x,theta_mu,var)
 
             new_p = likelihood * self.bel[i]
             new_bel[i] = new_p

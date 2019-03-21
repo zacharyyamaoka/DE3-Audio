@@ -19,9 +19,11 @@ class ALA():
     def update(self, dt=0.1): #must call this each loop
         self.DBF.motion_update(dt)
 
-    def new_reading(self, audio_vec): # Use CNN to locate sound, assume measurement variance here
+    def new_reading(self, audio_vec, head_yaw=0): # Use CNN to locate sound, assume measurement variance here
         theta_mu, confidence = self.Localizer.locate(audio_vec) #Localize sound
         var = self.measure_var #
+
+        theta_mu += head_yaw # shift to account for moving head
 
         if confidence > 0: #outlier rejection
             self.DBF.sensor_update(theta_mu, var)
