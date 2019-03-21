@@ -63,10 +63,12 @@ class PositionFilter():
     def bin_ind_2_theta(self, ind):
         return ((self.step * ind) + self.step/2)
 
-    def motion_update(self):
+    def motion_update(self,dt=0.1):
         #assume randomly left or right motion.....
         norm = 0
         new_bel = np.zeros(self.n)
+
+        drift_constant = self.drift * dt #function of dt and drift rate
 
         for i in np.arange(self.n):
             new_p = 0
@@ -75,7 +77,7 @@ class PositionFilter():
                 theta_j = self.bin_ind_2_theta(j)
                 d = self.angle_delta(theta,theta_j)
 
-                mul = np.exp(-d/(2*self.drift))
+                mul = np.exp(-d/(2*drift_constant))
                 new_p += mul * self.bel[j] #integrate belief from all thheta
 
             new_bel[i] = new_p
@@ -84,14 +86,24 @@ class PositionFilter():
         self.bel = new_bel
         print("Motion Update")
 
-    def update(self, theta_mu, var=np.pi): #update with sensor reading and accuracy
+    def eval_HRTF(self, x,theta_mu,var):
+        # more binary
+        d = self.angle_delta(x,theta_mu)
+        if d < var/2:
+            return 0.5
+        else:
+            return 0.1
+
+    def sensor_update(self, theta_mu, var=np.pi): #update with sensor reading and accuracy
 
         new_bel = np.zeros(self.n)
         total_p = 0
         for i in np.arange(self.n): #for each bin update with likelihood of measurement
             # x = (self.step * (i - 1)) + self.step/2 #find the center of the bin
             x = self.bin_ind_2_theta(i) #find the center of the bin
-            likelihood = self.eval_gaussian(x,theta_mu,var)
+
+            # likelihood = self.eval_gaussian(x,theta_mu,var)
+            likelihood = self.eval_HRTF(x,theta_mu,var)
 
             new_p = likelihood * self.bel[i]
             new_bel[i] = new_p
@@ -102,8 +114,8 @@ class PositionFilter():
         self.bel = new_bel #replace old belief
         print("Sensor Update")
 
-    def get_state(self):
 
+    def get_peak(self):
         #returns current best belief in location
         max = np.argmax(self.bel)
         theta = (self.step * max) + self.step/2 #inds start at 0

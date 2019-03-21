@@ -21,7 +21,7 @@ class TestMain(unittest.TestCase):
 
 
         # filter.update(np.pi/2,np.pi) #left side
-        filter.update(0,np.pi) #in front # i need to implment angular distance correctly
+        filter.sensor_update(0,np.pi) #in front # i need to implment angular distance correctly
         theta = np.arange(filter.n) * filter.step
 
         def show_bel():
@@ -37,10 +37,10 @@ class TestMain(unittest.TestCase):
         print(filter.bel)
         # plt.pause(1)
 
-        if True :
+        if False :
              #sensor
             for i in range(20):
-                filter.update(1.5*np.pi,np.pi) #right side
+                filter.sensor_update(1.5*np.pi,np.pi) #right side
                 show_bel()
 
             #motion
@@ -49,11 +49,11 @@ class TestMain(unittest.TestCase):
                 show_bel()
 
             for i in range(100):
-                filter.update(np.pi/2,np.pi) #left side
+                filter.sensor_update(np.pi/2,np.pi) #left side
                 show_bel()
 
             for i in range(100):
-                filter.update(1.5*np.pi,np.pi) #right side
+                filter.sensor_update(1.5*np.pi,np.pi) #right side
                 show_bel()
 
     def test_new_loss(self):
