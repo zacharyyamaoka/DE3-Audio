@@ -63,8 +63,8 @@ model_version = 51
 #gg
 
 
-trained_model_path = "./trained_models/"
-#trained_model_path = "/Users/zachyamaoka/Dropbox/de3_audio_data/trained_model/"
+# trained_model_path = "./trained_models/"
+trained_model_path = "/Users/zachyamaoka/Dropbox/de3_audio_data/trained_model/"
 model = AudioLocationNN(BIN_N) #instantiate model
 model.load_state_dict(torch.load(trained_model_path + str(model_version) + ".checkpoint"))
 optimizer = torch.optim.Adam(model.parameters(), lr=max_lr, weight_decay=regularization) #optimizer

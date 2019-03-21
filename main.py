@@ -9,8 +9,11 @@ from AudioLive import *
 from debugger import *
 import time
 from send_data import DataSender
+
 from audio_utils import *
 from dummy_head import DummyHead
+
+plt.ion()
 
 room_width = 5
 room_length = 5
@@ -22,9 +25,9 @@ CHUNK_SIZE = int(SAMPLE_RATE*WINDOW_TIME)
 VIZ = True
 # Sender = DataSender(ip="146.169.220.251", port=7400)
 Sender = DataSender(port=7400)
-Head = DummyHead(14441)
+Head = DummyHead(14141)
 Player = LivePlayer(window = WINDOW_TIME, sample_rate=SAMPLE_RATE, playback=True)
-Viz = Debugger()
+# Viz = Debugger()
 ALA = ALA()
 counter = 0
 
@@ -55,7 +58,7 @@ while True:
     counter += 1
     # Player.stream_audio(live=True, playback=True)
 
-    Head.look_around()
+    # Head.look_around()
 
     #TODO TUNE drift parameter
     ALA.update(dt) #call each loop

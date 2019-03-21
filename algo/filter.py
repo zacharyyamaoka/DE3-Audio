@@ -22,7 +22,7 @@ class PositionFilter():
         # uniform init
         self.bel = np.ones(self.n) / float(self.n)
 
-        self.drift = 0.1
+        self.drift = 1
 
 
     def filter(self, last_theta_mu, last_theta_var):
@@ -90,7 +90,7 @@ class PositionFilter():
         # more binary
         d = self.angle_delta(x,theta_mu)
         if d < var/2:
-            return 0.5
+            return 0.3
         else:
             return 0.1
 
@@ -98,12 +98,13 @@ class PositionFilter():
 
         new_bel = np.zeros(self.n)
         total_p = 0
+        print("New Measuerment: ", theta_mu)
         for i in np.arange(self.n): #for each bin update with likelihood of measurement
             # x = (self.step * (i - 1)) + self.step/2 #find the center of the bin
             x = self.bin_ind_2_theta(i) #find the center of the bin
 
-            # likelihood = self.eval_gaussian(x,theta_mu,var)
-            likelihood = self.eval_HRTF(x,theta_mu,var)
+            likelihood = self.eval_gaussian(x,theta_mu,var)
+            # likelihood = self.eval_HRTF(x,theta_mu,var)
 
             new_p = likelihood * self.bel[i]
             new_bel[i] = new_p
