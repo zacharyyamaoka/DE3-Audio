@@ -32,6 +32,7 @@ class AudioLocationDataset(Dataset):
         label = self.labels[idx]
         path = self.root + fname
         audio, sample_rate = librosa.core.load(path, sr=96000, mono=False)
+        #print(audio[:, :5])
         #print(audio.shape)
         #print([label])
         #label = label[:, :2]

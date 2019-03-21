@@ -1,4 +1,3 @@
-
 #Sci Imports
 import pandas as pd
 import numpy as np
@@ -22,44 +21,55 @@ from nn_util import *
 from models import *
 
 
+batch_size = 128
+BIN_N = 2
+
+#train_test_val_split(csv='./data_clip_label/label_full_mon.csv')
+
+train_data = AudioLocationDataset(csv="./data_clip_label/label_train.csv", transform = ToTensor(), use_subset=None, num_bin=BIN_N)
+val_data = AudioLocationDataset(csv="./data_clip_label/label_val.csv", transform = ToTensor(), use_subset=None, num_bin=BIN_N)
+test_data = AudioLocationDataset(csv="./data_clip_label/label_test.csv", transform = ToTensor(), use_subset=None, num_bin=BIN_N)
+
+train_samples = torch.utils.data.DataLoader(dataset=train_data,
+                                            batch_size=batch_size,
+                                            shuffle=True)
+
+val_samples = torch.utils.data.DataLoader(dataset=val_data,
+                                              batch_size=batch_size)
+
+test_samples = torch.utils.data.DataLoader(dataset=test_data,
+                                           batch_size=batch_size)
+
+def cosine_curve_schedule(max_lr, epochs, decay_param=3):
+    lr_schedule = max_lr*np.cos((np.arange(epochs)/epochs)*0.5*np.pi)
+    lr_schedule = np.exp(decay_param*(lr_schedule/max_lr))*lr_schedule/np.exp(decay_param)
+    return lr_schedule
+
 # PARAMETERS
-BIN_N = 4
 sample_rate = 96000 #hertz
 label_rate = 10 #hertz
 chunk_size = 2048 #number of samples to feed to model
 
-lr = 0.0003 #learning rate
+epochs = 40 #number of epochs
+max_lr = 0.01 #learning rate
+lr_schedule = cosine_curve_schedule(max_lr, epochs, decay_param=6)
 regularization = 3e-5
-epochs = 50 #number of epochs
-model_version = 0
 
+model_version = 51
 
-#data = AudioLocationDataset(csv="./data_clip_label/label.csv", transform = ToTensor(), use_subset=2100)
-# data = AudioLocationDataset(csv="./data_clip_label/label.csv", transform = ToTensor())
-train_test_val_split(csv="./data_clip_label/label.csv", save_loc='./data_clip_label/')
-# train_test_val_split(csv="./data_clip_label/label.csv", save_loc='./data_clip_label/')
+#print(lr_schedule)
+#plt.plot(lr_schedule)
+#plt.show()
+#gg
 
-train_data = AudioLocationDataset(csv="./data_clip_label/label_train.csv", transform = ToTensor(), use_subset=None, num_bin=BIN_N)
-test_data = AudioLocationDataset(csv="./data_clip_label/label_test.csv", transform = ToTensor(), use_subset=None, num_bin=BIN_N)
-
-batch_size = 128
-
-train_samples = torch.utils.data.DataLoader(dataset=train_data,
-                                              batch_size=batch_size,
-                                              shuffle=True)
-
-test_samples = torch.utils.data.DataLoader(dataset=test_data,
-                                              batch_size=batch_size)
 
 trained_model_path = "./trained_models/"
 #trained_model_path = "/Users/zachyamaoka/Dropbox/de3_audio_data/trained_model/"
 model = AudioLocationNN(BIN_N) #instantiate model
-#model.load_state_dict(torch.load(trained_model_path + str(model_version) + ".checkpoint"))
-optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=regularization) #optimizer
+model.load_state_dict(torch.load(trained_model_path + str(model_version) + ".checkpoint"))
+optimizer = torch.optim.Adam(model.parameters(), lr=max_lr, weight_decay=regularization) #optimizer
 
-def train(epochs):
-    lr = 0.003 if epochs<1 else 0.00003
-    optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=regularization) #optimizer
+def train(epochs, lr_schedule=None):
 
     model.train()
     #for plotting cost per batch
@@ -82,6 +92,11 @@ def train(epochs):
     plt.show()
 
     for e in range(epochs):
+        if lr_schedule is not None:
+            clr = lr_schedule[e]
+            optimizer = torch.optim.Adam(model.parameters(), lr=clr, weight_decay=regularization) #optimizer
+        else:
+            optimizer = torch.optim.Adam(model.parameters(), lr=max_lr, weight_decay=regularization) #optimizer
         for i, (x, y) in enumerate(train_samples):
 
             h = model.forward(x) #calculate hypothesis
@@ -103,7 +118,7 @@ def train(epochs):
             #     rhophi1 = [5, np.pi/2]
             # else:
             #     rhophi1 = [5, 1.5*np.pi]
-            print(h.detach().numpy())
+            #print(h.detach().numpy())
             pred_label = np.argmax(h.detach().numpy()[showind])
             pred_actual = y.detach().numpy()[showind]
 
@@ -129,7 +144,7 @@ def train(epochs):
 
             fig.canvas.draw()
             plt.pause(0.00001)
-            print('Epoch', e, '\tBatch', i, '\tCost', cost.item(), '\tavgCost', movingavg_costs[-1])
+            print('Epoch', e, '\tBatch', i, '\tCost', cost.item(), '\tavgCost', movingavg_costs[-1], '\tLearning rate', clr)
         # if e+1%15==0:
             # torch.save(model.state_dict(), trained_model_path + 'epoch'+str(e)+'.checkpoint')
 
@@ -142,6 +157,7 @@ def test(samples):
     correct=0
     for i, (x, y) in enumerate(samples):
         h = model.forward(x) #calculate hypothesis
+        print(h)
         pred = np.argmax(h.detach().numpy(), axis=1)
         y = y.detach().numpy().squeeze()
         c =np.sum(np.equal(pred, y))
@@ -157,16 +173,14 @@ def test(samples):
 # for lr in learning_rate:
 #     model = AudioLocationNN() #instantiate model
 #     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=regularization) #optimizer
-min_cost = train(epochs)
-print("MIN COST: ", min_cost)
+#min_cost = train(epochs, lr_schedule)
+#print("MIN COST: ", min_cost)
 #     loss.append(min_cost)
 
 accuracy = test(test_samples)
 print('Test accuracy', accuracy)
 
-
-
-model_version += epochs
-torch.save(model.state_dict(), trained_model_path + str(model_version) + ".checkpoint")
+#model_version += epochs
+#torch.save(model.state_dict(), trained_model_path + str(model_version) + ".checkpoint")
 # plt.plot(learning_rate,loss)
 # plt.pause(4)
