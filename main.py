@@ -22,7 +22,7 @@ CHUNK_SIZE = int(SAMPLE_RATE*WINDOW_TIME)
 VIZ = True
 # Sender = DataSender(ip="146.169.220.251", port=7400)
 Sender = DataSender(port=7400)
-Head = DummyHead(14141)
+Head = DummyHead(14441)
 Player = LivePlayer(window = WINDOW_TIME, sample_rate=SAMPLE_RATE, playback=True)
 Viz = Debugger()
 ALA = ALA()
