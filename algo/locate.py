@@ -22,6 +22,16 @@ class SoundLocalizer():
         audio_vec = audio_vec.T
         # print("SHHAPE", audio_vec.shape)
         #PUT HAROONS CODE INTO HERE
+
+        #normalize and mean center sound
+        mean = np.mean(audio_vec).astype(np.int16)
+        audio_vec -= mean
+
+        max = np.max(np.abs(audio_vec)).astype(np.int16)
+        print(audio_vec.shape)
+        print(max)
+        audio_vec = audio_vec/max
+
         model_input=np.expand_dims(audio_vec, 0)
         model_input_tensor = torch.from_numpy(model_input)
         model_input_tensor = torch.tensor(model_input_tensor,dtype=torch.float)

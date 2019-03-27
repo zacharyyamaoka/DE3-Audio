@@ -11,8 +11,8 @@ class DummyHead():
         self.theta = 0
 
         #need big range here
-        self.max_left = 60
-        self.max_right = -60
+        self.max_left = 30
+        self.max_right = -30
 
         #Starting moving left
         self.left = True
@@ -36,7 +36,7 @@ class DummyHead():
                 self.left = True
                 self.right = False
 
-        # self.theta = -90
+        # self.theta = 20
         self.move(self.theta)
 
     def get_rotation(self):
@@ -63,7 +63,7 @@ class DummyHead():
 
     def calibrate(self, q1_angle, q2_angle):
         #make this so
-        q1_offset = 90
+        q1_offset = 90 - 30
         q2_offset = 0
 
         # q1_angle *= -1

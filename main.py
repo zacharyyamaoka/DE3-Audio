@@ -58,7 +58,7 @@ while True:
     counter += 1
     # Player.stream_audio(live=True, playback=True)
 
-    # Head.look_around()
+    Head.look_around()
 
     #TODO TUNE drift parameter
     ALA.update(dt) #call each loop
