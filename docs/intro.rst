@@ -146,14 +146,31 @@ See walker in action:
 Real Data Generation
 *********************
 
+The best data is data taken from the actually test distribution. To generate this dataset, I set up the dummy head and projector as it would be setup on the installation day. I then created
+a display that would point to a random heading and let a python script run that captured a sound recording every 30s. Essentially: the computer would tell the person where to stand, the person
+would move to that location while making sound, then the computer would capture a sound recording.
+
+The great advantage was that we were capturing the sound features specific to the dummy head we would use in the installation. ITD, IDL and especially the HRTF are greatly affected by the shape of the head,
+body and the ears. The most realistic dataset we could have generated in 3D Tune-In would have utlised the publicly available Kemar HRTF, and then we would have used the Kemar in the installation.
+Instead we generated a fair amount of syntetic data using the incorrect HRTF, and then fine tuned our model using a large amount of real data recorded on the actually head.
 
 
 Different Data Types
 *********************
 
+Thought was given to what type of sound to use in the data generation. Intially we:
+
+* *Used the same sound.* The model would require less capciacity to localize one sound as suppose to learning to detect the features on man different types of sound.
+
+* *Use constant dB sound*. If the sound level is kept the same, then the model could learn to predict distance
+
+
+
 Data pre processing
 Data all the same
 Normalize but loose distance information. keep the relative information
+different label types
+Clipping the clips to be of approiate length. The features are very small we are trying to caputure.
 
 
 CNN, changed the regression to classifier
