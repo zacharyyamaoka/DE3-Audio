@@ -10,6 +10,8 @@ Welcome to DE3-Audio's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   intro
+
 
 
 Indices and tables

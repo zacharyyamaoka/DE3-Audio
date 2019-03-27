@@ -15,7 +15,7 @@ class TestMain(unittest.TestCase):
         plt.ion()
         plt.show()
 
-        fig1 = plt.figure(1)
+        fig1 = plt.figure(1,figsize=(16,9))
         ax1 = fig1.add_subplot(111)
         ax1.set_ylim(-5,5)
         ax1.set_xlim(-5,5)
@@ -26,7 +26,7 @@ class TestMain(unittest.TestCase):
         curr_time = time.time()
 
         time_running = 0
-        rec_time = 0.1 * 60
+        rec_time = 0.5 * 60
 
         walker = RandomPolarWalker()
 
@@ -43,9 +43,9 @@ class TestMain(unittest.TestCase):
             ax1.plot(y,x,'+')
             plt.pause(0.01)
 
-        # print(x_path)
-        # plt.plot(y_path,x_path,'+')
-        # plt.show()
+    # print(x_path)
+    # plt.plot(y_path,x_path,'+')
+    # plt.show()
     def test_RandomPolarWalker(self):
 
         Viz = Debugger()

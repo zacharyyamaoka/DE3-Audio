@@ -1,0 +1,366 @@
+
+
+<!DOCTYPE html>
+<!--[if IE 8]><html class="no-js lt-ie9" lang="en" > <![endif]-->
+<!--[if gt IE 8]><!--> <html class="no-js" lang="en" > <!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  
+  <title>Project Scope &mdash; DE3-Audio v1 documentation</title>
+  
+
+  
+  
+  
+  
+
+  
+  <script type="text/javascript" src="_static/js/modernizr.min.js"></script>
+  
+    
+      <script type="text/javascript" id="documentation_options" data-url_root="./" src="_static/documentation_options.js"></script>
+        <script type="text/javascript" src="_static/jquery.js"></script>
+        <script type="text/javascript" src="_static/underscore.js"></script>
+        <script type="text/javascript" src="_static/doctools.js"></script>
+        <script type="text/javascript" src="_static/language_data.js"></script>
+    
+    <script type="text/javascript" src="_static/js/theme.js"></script>
+
+    
+
+  
+  <link rel="stylesheet" href="_static/css/theme.css" type="text/css" />
+  <link rel="stylesheet" href="_static/pygments.css" type="text/css" />
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="prev" title="Welcome to DE3-Audio’s documentation!" href="index.html" /> 
+</head>
+
+<body class="wy-body-for-nav">
+
+   
+  <div class="wy-grid-for-nav">
+    
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+          
+
+          
+            <a href="index.html" class="icon icon-home"> DE3-Audio
+          
+
+          
+          </a>
+
+          
+            
+            
+          
+
+          
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+
+          
+        </div>
+
+        <div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="main navigation">
+          
+            
+            
+              
+            
+            
+              <p class="caption"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Project Scope</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#initial-planning">Initial Planning</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#data-generation">Data Generation</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#d-tune-in">3D Tune-In</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-gen-with-maxsp">Data Gen. with MaxSP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-gen-with-python">Data Gen. with Python</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#real-data-generation">Real Data Generation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#different-data-types">Different Data Types</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#cnn-changed-the-regression-to-classifier">CNN, changed the regression to classifier</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#loss-function-not-completely-straight-forward">Loss function not completely straight forward</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#display">Display</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#probabilistc-filter">Probabilistc filter</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#histogram-display">histogram display</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+            
+          
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap">
+
+      
+      <nav class="wy-nav-top" aria-label="top navigation">
+        
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">DE3-Audio</a>
+        
+      </nav>
+
+
+      <div class="wy-nav-content">
+        
+        <div class="rst-content">
+        
+          
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<div role="navigation" aria-label="breadcrumbs navigation">
+
+  <ul class="wy-breadcrumbs">
+    
+      <li><a href="index.html">Docs</a> &raquo;</li>
+        
+      <li>Project Scope</li>
+    
+    
+      <li class="wy-breadcrumbs-aside">
+        
+            
+            <a href="_sources/intro.rst.txt" rel="nofollow"> View page source</a>
+          
+        
+      </li>
+    
+  </ul>
+
+  
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+            
+  <div class="section" id="project-scope">
+<h1>Project Scope<a class="headerlink" href="#project-scope" title="Permalink to this headline">¶</a></h1>
+<p><em>“The music is not in the notes, but in the silence between.”</em></p>
+<p><em>- Wolfgang Amadeus Mozart</em></p>
+<p>This Report outlines work done for the 2019 Audio Experience Design Installation
+at Imperial College London. Briefly it involved:</p>
+<ul class="simple">
+<li>Generating a mixed synthetic and real 3D audio dataset with over 2000 audio clips</li>
+<li>Training a CNN to make heading predictions based on 2 channel audio vectors</li>
+<li>Utilising a probabilistic filter to smooth heading predictions</li>
+<li>Creating an interactive display, with real time audio input, and graphic output</li>
+</ul>
+<p>In total, the result of this project was: an interactive audio localisation system, which utilised
+live binaural recordings to make predictions on sound source location, and then project
+the predicted heading on the floor.</p>
+<div class="figure align-center">
+<img alt="_images/dummy_head_side.jpg" src="_images/dummy_head_side.jpg" />
+</div>
+<div class="section" id="initial-planning">
+<h2>Initial Planning<a class="headerlink" href="#initial-planning" title="Permalink to this headline">¶</a></h2>
+<p>The initial aims for project were submitted in the preliminary document:</p>
+<ul class="simple">
+<li><strong>Model Human Audio Localisation</strong></li>
+</ul>
+<p>Fulfilling this criteria was the bulk of the installation work. Ultimately, we were successful
+in this endeavour, however, in a simpler case. Humans have the ability to differentiate
+between sounds source coming from: the left, right, front or back. Our system could predict left or right with 76% accuracy.</p>
+<ul class="simple">
+<li><strong>Create an Interactive Dark room, where participants can be localised in real time</strong></li>
+</ul>
+<p>The initial vision was to locate sounds of human foot steps in a dark room, and then shine a
+a spot light on their location. Early on in the project, it was suggested that utilising
+a projector would simpler then making a custom spotlight. We incorporated this suggestion, and
+through testing found that the projector was bright enough to be seen in a light room.</p>
+<ul class="simple">
+<li><strong>Tie in with educational aspect to explain how our human audio localisation works</strong></li>
+</ul>
+<p>During the Audio Experience day and Dyson Open House we spoke with visitors and explained our installation.</p>
+<p>We began our explanation by asking the visitor to close their eyes, and then locate us as we moved around.
+The idea was to first illustrate the incredible computation our brains do: localising
+sounds in a 3D environment based purely on two auditory signals.</p>
+<p>We then explained the process through which this computation is believed to be done (Duplex theory), utilising
+inter-aural time difference (ITD) and inter-aural level difference (ILD). Once this introduction finished, we proceeded to demonstrate
+our installation which modelled this system computationally.</p>
+<p>Inevitably, audience members would walk around the head and see poor performance between front and back localisation.</p>
+<p>This would then lead to the discussion of cone of confusion, and we would point out that
+the ITD and ILD between front and back are identical. We also took this opportunity to explain
+direction dependent filtering done by our pinna’s and the role of head movement (at the same time explaining
+why our dummy head was rotating around).</p>
+</div>
+<div class="section" id="data-generation">
+<h2>Data Generation<a class="headerlink" href="#data-generation" title="Permalink to this headline">¶</a></h2>
+<p>The field of <em>machine listening</em> is hot. Previous work has utilised large microphone arrays (5+) with custom algorithms and hand picked features [1]
+Recent advances in machine learning, however, have made it possible to learn extremely complex functions from data.
+These advances are being applied to reach state of the art performance in sound localisation [1].</p>
+<p>In line with previous work aimed to train a convolutional neural network (CNN) to predict sound location based on time series audio data. Where to our knowledge we hoped to differ
+was in method of generating our data and in utilising only two microphones, mimicking the human system, as suppose to a large microphone array.</p>
+<div class="section" id="d-tune-in">
+<h3>3D Tune-In<a class="headerlink" href="#d-tune-in" title="Permalink to this headline">¶</a></h3>
+<p>3D Tune-In is an open-source library for real-time binaural spatialisation. Given a mono audio file, it can generate the
+corresponding localised stereo recording for a point in space relative to the listener. While this mapping is complex,
+for our purposes we assumed it to be a black box. We were interested only in approximating the inverse function.
+Given a binaural recording, predict the location of the sound relative to the listener.</p>
+<p>The algorithm for the approximation would be a CNN, what was needed was a large dataset.</p>
+</div>
+<div class="section" id="data-gen-with-maxsp">
+<h3>Data Gen. with MaxSP<a class="headerlink" href="#data-gen-with-maxsp" title="Permalink to this headline">¶</a></h3>
+<p>In order to train the CNN, we needed a large dataset with audio clips and corresponding location labels. Rather then generate this
+by handing using the offline recording feature in the 3D Tune-In test app, we accomplished this programmatically.</p>
+<p>First, I set a 10 min timer and started an online recording in 3D Tune-In. A script in MaxSP, which interfaced with 3D Tune-In using open sound control (OSC),
+uniformly iterate through various distance and headings, and moved the sound source. As the recording ran, the max patch would write the sound source’s current
+location into a text file.</p>
+<p>After 10 mins, the online recording and the max patch were stopped. To utilise the data, a function was written to clip the front and end of the audio data, to
+ensure it matched with the labels.</p>
+<p><strong>Problems</strong></p>
+</div>
+<div class="section" id="data-gen-with-python">
+<h3>Data Gen. with Python<a class="headerlink" href="#data-gen-with-python" title="Permalink to this headline">¶</a></h3>
+<p>In order to boost performance, we wanted to make sure that our training data was as close as possible to the test data. I realised we could still interface
+using OSC but utilise python to create a more natural motion pattern. Data was recorded in the same manner as described above, but now the sound source was moved
+by simulating a random polar walker. This random walker walks in circles around the listener (similar to how we imagined poeple would interact with the dummy head) with various
+speeds and accelerations modelled from the average human.</p>
+<ul class="simple">
+<li>Average walking speed: 1.4 m/s</li>
+<li>Average walking acceleration over short period of time: 0.86 m/s^2</li>
+</ul>
+<p>At each time step, there is a small probability, the walker switches directions.</p>
+<p>See code for walker:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">dt</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+
+    <span class="c1">#update speed and orientation</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">timer</span> <span class="o">+=</span> <span class="n">dt</span>
+
+    <span class="bp">self</span><span class="o">.</span><span class="n">r_dot</span> <span class="o">+=</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">acc_std</span><span class="p">)</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">theta_dot</span> <span class="o">+=</span> <span class="n">dt</span> <span class="o">*</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">normal</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span><span class="bp">self</span><span class="o">.</span><span class="n">acc_std</span><span class="p">)</span> <span class="c1">#in small steps....</span>
+
+    <span class="c1">#Move person</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">r</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">r_dot</span> <span class="o">*</span> <span class="n">dt</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">theta</span> <span class="o">+=</span> <span class="bp">self</span><span class="o">.</span><span class="n">theta_dot</span> <span class="o">*</span> <span class="n">dt</span>
+
+    <span class="c1"># with small probabality switch direction</span>
+    <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">timer</span> <span class="o">&gt;</span> <span class="mi">3</span><span class="p">:</span> <span class="c1"># every one second you may switchh</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">timer</span> <span class="o">=</span> <span class="mi">0</span>
+
+        <span class="c1">#with small probability stop, mabye also fixes this unbounded increase problem</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">0.8</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">theta_dot</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="k">if</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">random</span><span class="p">()</span> <span class="o">&gt;</span> <span class="mf">0.8</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">r_dot</span> <span class="o">=</span> <span class="mi">0</span>
+</pre></div>
+</div>
+<p>See walker in action:</p>
+</div>
+<div class="section" id="real-data-generation">
+<h3>Real Data Generation<a class="headerlink" href="#real-data-generation" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="different-data-types">
+<h3>Different Data Types<a class="headerlink" href="#different-data-types" title="Permalink to this headline">¶</a></h3>
+<p>Data pre processing
+Data all the same
+Normalize but loose distance information. keep the relative information</p>
+</div>
+<div class="section" id="cnn-changed-the-regression-to-classifier">
+<h3>CNN, changed the regression to classifier<a class="headerlink" href="#cnn-changed-the-regression-to-classifier" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="loss-function-not-completely-straight-forward">
+<h3>Loss function not completely straight forward<a class="headerlink" href="#loss-function-not-completely-straight-forward" title="Permalink to this headline">¶</a></h3>
+<p>Haroon,</p>
+</div>
+<div class="section" id="display">
+<h3>Display<a class="headerlink" href="#display" title="Permalink to this headline">¶</a></h3>
+<p>Sophie did sound.</p>
+<p>I altered it to add in this filtering.</p>
+<p>Beacuse to noisy data</p>
+</div>
+<div class="section" id="probabilistc-filter">
+<h3>Probabilistc filter<a class="headerlink" href="#probabilistc-filter" title="Permalink to this headline">¶</a></h3>
+</div>
+<div class="section" id="histogram-display">
+<h3>histogram display<a class="headerlink" href="#histogram-display" title="Permalink to this headline">¶</a></h3>
+<p>[2] Cuevas-Rodríguez M, Picinali L, González-Toledo D, et al., 2019,
+3D Tune-In Toolkit: An open-source library for real-time binaural spatialisation,
+Plos One, Vol:14, Pages:e0211899-e0211899
+´
+See <a class="reference external" href="https://www.dropbox.com/s/s0ut74x6u8ri9yr/AXP-TeamPingLight.docx?dl=0">initial proposal here</a></p>
+<dl class="docutils">
+<dt>Team coordination tools:</dt>
+<dd>used messenger, Github and Trello</dd>
+</dl>
+</div>
+</div>
+</div>
+
+
+           </div>
+           
+          </div>
+          <footer>
+  
+    <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
+      
+      
+        <a href="index.html" class="btn btn-neutral float-left" title="Welcome to DE3-Audio’s documentation!" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+      
+    </div>
+  
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>
+        &copy; Copyright 2019, Zachary Yamaoka, Haroon Shams, Sophie Owen
+
+    </p>
+  </div>
+  Built with <a href="http://sphinx-doc.org/">Sphinx</a> using a <a href="https://github.com/rtfd/sphinx_rtd_theme">theme</a> provided by <a href="https://readthedocs.org">Read the Docs</a>. 
+
+</footer>
+
+        </div>
+      </div>
+
+    </section>
+
+  </div>
+  
+
+
+  <script type="text/javascript">
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script>
+
+  
+  
+    
+   
+
+</body>
+</html>

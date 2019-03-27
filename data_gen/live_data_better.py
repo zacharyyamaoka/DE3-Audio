@@ -22,9 +22,9 @@ from AudioLive import LivePlayer
 
 # N = 0
 # nbefore tunning 2106
-file_count = 2106 #enter nexts file num
+file_count = 3000 #enter nexts file num
 WINDOW_TIME = 2
-rec_min = 10
+rec_min = 0.5
 SAMPLE_RATE = 96000
 rec_time = rec_min * 60
 
@@ -87,13 +87,13 @@ while time_running < rec_time:
         print("Saving Files: time stamp ", time_running)
         data = Player.get_sample_rec()
         # print(data)
-        wav.save_wav("clip"+str(file_count), data)
+        # wav.save_wav("clip"+str(file_count), data)
 
         theta = Walker.heading()
         Walker.slow_update(WINDOW_TIME)
         Viz.draw_heading(theta,show = True)
 
-        file.write("clip"+str(file_count)+".wav", theta)
+        # file.write("clip"+str(file_count)+".wav", theta)
         file_count += 1
     #
     # if draw_time >= draw_period:
