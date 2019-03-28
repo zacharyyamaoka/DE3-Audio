@@ -17,6 +17,7 @@ The final result of work was: an interactive audio localisation system, which ut
 live binaural recordings to make predictions on sound source location, and then project
 the predicted heading on the floor.
 
+**Dummy Head with two DPA Lapel Mics**
 
 .. figure::  imgs/dummy_head_side.jpg
    :align:   center
@@ -32,24 +33,26 @@ Project Aims
 
 The initial aims for project were submitted in the `preliminary document`_:
 
--	**Model Human Audio Localisation**
+-	*Model Human Audio Localisation*
 
 Fulfilling this criteria was the bulk of the installation work. Ultimately, we were successful
 in this endeavour, however, in a simpler case. Humans have the ability to differentiate
 between sounds source coming from: left, right, front or back. Our system could predict left or right with 76% accuracy (see figure below).
 
+**Test Accuracy of Algorithm**
+
 .. figure::  imgs/test_acc.png
    :align:   center
 
 
--	**Create an Interactive Dark room, where participants can be localised in real time**
+-	*Create an Interactive Dark room, where participants can be localised in real time*
 
 The initial vision was to locate sounds of human foot steps in a dark room, and then shine a
 a spot light on their location. Early on in the project, it was suggested that utilising
 a projector would be simpler then making a custom spotlight. We incorporated this suggestion, and
 through testing found that the projector was bright enough to be seen, even in a lit room.
 
--	**Tie in with educational aspect to explain how our human audio localisation works**
+-	*Tie in with educational aspect to explain how our human audio localisation works*
 
 During the Audio Experience day and Dyson Open House we spoke with visitors and explained our installation.
 
@@ -70,21 +73,27 @@ direction dependent filtering done by our ear pinna's and the role of head movem
 Team Coordination
 ************************
 
-Team coordination 
- used messenger, Github and Trello
+Team coordination was facilitated by: Messenger, `Github`_, Trello
+
+**Trello Board for Task Assignment**
+
+.. figure::  imgs/trello.png
+   :align:   center
+
 
 
 .. _preliminary document: https://www.dropbox.com/s/s0ut74x6u8ri9yr/AXP-TeamPingLight.docx?dl=0
+.. _Github: https://www.dropbox.com/s/s0ut74x6u8ri9yr/AXP-TeamPingLight.docx?dl=0
 
 Data Generation
 -------------------------
 
-The field of *machine listening* is hot. Previous work has utilised large microphone arrays (5+) with custom algorithms and hand picked features [1]
+The field of *machine listening* is hot. Previous work has utilised large microphone arrays (5+) with custom algorithms and hand picked features [1].
 Recent advances in machine learning, however, have made it possible to learn extremely complex functions from data.
 These advances are being applied to reach state of the art performance in sound localisation [1].
 
-In line with previous work aimed to train a convolutional neural network (CNN) to predict sound location based on time series audio data. Where to our knowledge we hoped to differ
-was in method of generating our data and in utilising only two microphones, mimicking the human system, as suppose to a large microphone array.
+In line with previous work, our team aimed to train a convolutional neural network (CNN) to predict sound location based on time series audio data. Where we hoped innovate and learn
+was in the method of generating training data and in utilising only two microphones, mimicking the human system, as suppose to a large microphone array.
 
 3D Tune-In
 ************
@@ -92,32 +101,40 @@ was in method of generating our data and in utilising only two microphones, mimi
 3D Tune-In is an open-source library for real-time binaural spatialisation. Given a mono audio file, it can generate the
 corresponding localised stereo recording for a point in space relative to the listener. While this mapping is complex,
 for our purposes we assumed it to be a black box. We were interested only in approximating the inverse function.
-Given a binaural recording, predict the location of the sound relative to the listener.
-
-The algorithm for the approximation would be a CNN, what was needed was a large dataset.
+Given a binaural recording, predict the location of the sound relative to the listener. The algorithm for the approximation would be a CNN.
 
 Data Gen. with MaxSP
 *********************
 
 In order to train the CNN, we needed a large dataset with audio clips and corresponding location labels. Rather then generate this
-by handing using the offline recording feature in the 3D Tune-In test app, we accomplished this programmatically.
+by hand using the offline recording feature in the 3D Tune-In test app, we accomplished this programmatically.
 
 First, I set a 10 min timer and started an online recording in 3D Tune-In. A script in MaxSP, which interfaced with 3D Tune-In using open sound control (OSC),
 uniformly iterate through various distance and headings, and moved the sound source. As the recording ran, the max patch would write the sound source's current
-location into a text file.
+location into a text file (`example .txt file`_).
+
+**Moving Sound Source using MaxSP**
+
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="//www.youtube.com/embed/EC2ePor7Wz0" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+    </div>
 
 After 10 mins, the online recording and the max patch were stopped. To utilise the data, a function was written to clip the front and end of the audio data, to
 ensure it matched with the labels.
 
-**Problems**
+.. _example .txt file: https://github.com/zacharyyamaoka/DE3-Audio/blob/master/data_label/data_rec001.txt
+
 
 Data Gen. with Python
 *********************
 
 In order to boost performance, we wanted to make sure that our training data was as close as possible to the test data. I realised we could still interface
-using OSC but utilise python to create a more natural motion pattern. Data was recorded in the same manner as described above, but now the sound source was moved
-by simulating a random polar walker. This random walker walks in circles around the listener (similar to how we imagined poeple would interact with the dummy head) with various
-speeds and accelerations modelled from the average human.
+using OSC but utilise python to create a more natural motion pattern. The natural motion meant that for a given window of data, the source would stay around the same location,
+as suppose to teleporting around the sound scape. Data was recorded in the same manner as described above, but now the sound source was moved
+by simulating a random polar walker. This random walker walks in circles around the listener (similar to how we imagined people would interact with the dummy head) with
+speeds and accelerations similar to the average human [2].
 
 * Average walking speed: 1.4 m/s
 * Average walking acceleration over short period of time: 0.86 m/s^2
@@ -150,12 +167,12 @@ See code for walker::
               self.r_dot = 0
 
 See walker in action:
-
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="//www.youtube.com/embed/EC2ePor7Wz0" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+        <iframe src="//www.youtube.com/embed/z80D9Xikr2k" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
     </div>
+
 
 Real Data Generation
 *********************
@@ -269,15 +286,16 @@ Final Outcome
 Insert Video's!
 of Sophie
 
+[1] Vera-Diaz, Juan Manuel, et al.
+“Towards End-to-End Acoustic Localization Using Deep Learning: From Audio Signal to Source Position Coordinates.”
+2018, doi:10.20944/preprints201807.0570.v1.
+
+[2] Lawrence, Peter.
+“What Is the Maximum Walking Acceleration/Deceleration over a Very Short Time Period (E.g., 0.02, 0.1, 0.5 Sec)?”
+ ResearchGate, 8 Aug. 2016, www.researchgate.net/post/What_is_the_maximum_walking_acceleration_deceleration_over_a_very_short_time_period_eg_002_01_05_sec.
+
+
 [2] Cuevas-Rodríguez M, Picinali L, González-Toledo D, et al., 2019,
 3D Tune-In Toolkit: An open-source library for real-time binaural spatialisation,
 Plos One, Vol:14, Pages:e0211899-e0211899
 ´
-See `initial proposal here`_
-
-
-
-Team coordination tools:
- used messenger, Github and Trello
-
-.. _initial proposal here: https://www.dropbox.com/s/s0ut74x6u8ri9yr/AXP-TeamPingLight.docx?dl=0
