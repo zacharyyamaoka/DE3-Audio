@@ -158,44 +158,95 @@ Instead we generated a fair amount of syntetic data using the incorrect HRTF, an
 Different Data Types
 *********************
 
-Thought was given to what type of sound to use in the data generation. Intially we:
+Data Recording Length.
 
-* *Used the same sound.* The model would require less capciacity to localize one sound as suppose to learning to detect the features on man different types of sound.
+Thought was given to what sampling frequency and bit depth should be used for recording the sound, and what the prediction window
+duration should be.
+
+For synthetic data, 44100 Hz and 16 bit depth was used to capture recordings in 3D Tune-In. For input sounds, Audacity was used to convert youtube wav files, to the correct sampling freq and mono track format required by
+the toolkit.
+
+For real data, we initially also used 44100 Hz and 16 bit depth. From testing it seemed the level resolution seemed to be sufficient to determine ILD, but ITD would become more apparent if we increased sampling freq.
+Thus, also conscious of space requirements we opted for a 96000 Hz sampling rate. This simply required changing a few parameters in our code and changing the sampling freq. on the MOTU Ultralight we
+where using to interface with the DPA lapel mics.
+
+We tested a number of different window lengths but ultimately utilised a 0.005 second window. At 96000 Hz this corresponded to 480 samples. This choice was made based on the size of the ITD feature we
+wanted to capture. Based on the Woodworth's formula for ITD, we knew that the maximum delay on our dummy head would be around 0.0006 seconds (assuming the sound travels at 340 m/s).
+As our CNN was not integrating information over time, it needed sufficient temporal information to make the correct decision in the moment. To small and the important relative information of the sound pressure
+wave would be loss. To large and the delay features would be obscured. 0.005 seconds seemed right.
+
+https://www.researchgate.net/figure/Woodworths-Formula-for-Interaural-Time-Delay-ITD-This-model-is-a-simplification-The_fig3_247930825
+
+
+Thought was given to what type of sound to use in the data generation. Initially ideas that guided our thinking were:
+
+* *Used the same sound.* The model would require less capacity to localise one sound as suppose to learning to detect the features on many different types of sound.
 
 * *Use constant dB sound*. If the sound level is kept the same, then the model could learn to predict distance
 
-To many frequency components made it to complex. Simple sinusoid would make it easier to detect peaks ect..
+With this in mind we decided upon a rain sound. We also thought that there was an interesting psychological aspect as humans perceive rain to be all around us, but the
+computer program would be indifferent.
 
-Data pre processing
-Data all the same
-Normalize but loose distance information. keep the relative information
-different label types
-Clipping the clips to be of approiate length. The features are very small we are trying to caputure.
+INSERT RAIN SOUND VIDEO
+
+It became apparent though that this data had to many frequency components and was seemingly random. We felt it would be easier to learn to extract ITD and ILD features
+on a simpler wave form. First clapping was tried, we hopped the algorithm would pick up on the clear time and level differences in the impulse peak.
+
+INSERT CLAPPING VIDEO
+
+Then Beethoven's Moonlight Sonata. Compared to rain, Piano sound is relatively pure, consisting mostly of a few main harmonics and their over tones.
+
+INSERT Moonlight Sonata VIDEO
+
+Training on the piano music also meant the algorithm would better generate to other "pure tones", like a constant whistle. Despite such exploration, our algorithm
+performed sub-optimally in the first installation.
+
+We made a number of changes.
 
 
-CNN, changed the regression to classifier
-*****************************************
 
-Loss function not completely straight forward
-*********************************************
+Improvements
+*************
 
-Haroon,
+From the data point of view we made a number of simplications whihch discarded direction and distance information but enabled use to improve "left or right" prediction.
 
+1. We created a data set using a pure sinusoid at 1.6 kHz. While this would make it impossible to detect direction dependent features, it would be simpler to for the algorithm to
+extract ITD and ILD.
 
-Display
+2. We normalised and mean centred the data::
+    INSERT CODE
+
+  While this discarded distance information, it meant that improved robustness to level differences and background noise (like that found in the installation)
+
+3. We changed it from regression to classification problem. Previously our CNN was trained to predict source heading on a continuous range between 0 and 2 pi. Now it would simply predict left or
+right.
+
+4. Added head movement. While we would loose a lot of the angular resolution by just being able to predict left or right, we could compensate by adding heading movement. Moving the head slightly is a
+technique also used by humans to differentiate between front and back sound sources. In Implementation, our dummy head was moved by a 5v servo motor powered by an Arduino Uno.
+
+5. Added a probabilistic filter. In order to utilise head movement information, predictions needed to be integrated over time. For this, a discrete Bayes filter is utilised.
+
+Filtering
 *********
 
-Sophie did sound.
+Initially, filtering of the predictions was done using a simple moving average filter::
 
-I altered it to add in this filtering.
+  INSERT CODE
 
-Beacuse to noisy data
+Based on the inconsistent performance in the first installation, however, it became clear that a more powerful filter would be needed.
+The final algorithm used a discrete Bayes filter which, while being more robust to spurious predictions, also had the added benefit of integrating predictions over time and accounting for the head
+movement.
 
-Probabilistc filter
-*********************
+INSERT VIDEO OF CODE IN ACTION.
 
-histogram display
-*******************
+We model the sound source as a random particle that experiences a small gaussian drift each time step. The prediction is also modelled using a gaussian with variance 180 deg, to
+reflect the fact the head cannot differentiate front from back.
+
+Now representing our prediction as a belief between 0 and 2 pi, we felt it would be more accurate to change our display from the single slice showed in the first installation.
+For the Open House, a MaxSP patch was created which wrapped belief distribution around a circle.
+
+INSERT VIDEO OF MAXSP PATH RUNNING
+
 
 
 [2] Cuevas-Rodríguez M, Picinali L, González-Toledo D, et al., 2019,
