@@ -185,7 +185,7 @@ The best data is data taken from the actually test distribution. To generate thi
 a display that would point to a random heading and let a python script run that captured a sound recording every 30s. Essentially: the computer would tell the person where to stand, the person
 would move to that location while making sound, then the computer would capture a sound recording.
 
-**Screen which Pointed in Direction to Stand**
+**Heading Display**
 
 .. raw:: html
 
@@ -195,12 +195,12 @@ would move to that location while making sound, then the computer would capture 
 
 |
 
-**Following the Arrow Around the Head While Making Noise**
+**Following Arrow Around Head while Making Noise**
 
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="//www.youtube.com/embed/zB7vwWIljaw" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+        <iframe src="//www.youtube.com/embed/4Zyq-jSEsto" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
     </div>
 
 |
@@ -422,7 +422,7 @@ Final Outcome
 .. figure::  imgs/v1_head.jpg
    :align:   center
 
- **Audio Experience Day**
+**Audio Experience Day**
 
  .. figure::  imgs/v2_head.jpg
     :align:   center

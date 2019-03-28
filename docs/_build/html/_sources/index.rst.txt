@@ -11,12 +11,3 @@ Welcome to DE3-Audio's documentation!
    :caption: Contents:
 
    intro
-
-
-
-Indices and tables
-==================
-
-* :ref:`genindex`
-* :ref:`modindex`
-* :ref:`search`
