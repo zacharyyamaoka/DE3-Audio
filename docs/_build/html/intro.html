@@ -8,7 +8,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Project Scope &mdash; DE3-Audio v1 documentation</title>
+  <title>Project Report &mdash; DE3-Audio v1 documentation</title>
   
 
   
@@ -81,7 +81,7 @@
             
               <p class="caption"><span class="caption-text">Contents:</span></p>
 <ul class="current">
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Project Scope</a><ul>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Project Report</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#initial-planning">Initial Planning</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#data-generation">Data Generation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#d-tune-in">3D Tune-In</a></li>
@@ -89,13 +89,11 @@
 <li class="toctree-l3"><a class="reference internal" href="#data-gen-with-python">Data Gen. with Python</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#real-data-generation">Real Data Generation</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#different-data-types">Different Data Types</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#cnn-changed-the-regression-to-classifier">CNN, changed the regression to classifier</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#loss-function-not-completely-straight-forward">Loss function not completely straight forward</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#display">Display</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#probabilistc-filter">Probabilistc filter</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#histogram-display">histogram display</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#improvements">Improvements</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#filtering">Filtering</a></li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="#final-outcome">Final Outcome</a></li>
 </ul>
 </li>
 </ul>
@@ -143,7 +141,7 @@
     
       <li><a href="index.html">Docs</a> &raquo;</li>
         
-      <li>Project Scope</li>
+      <li>Project Report</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -162,19 +160,19 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="project-scope">
-<h1>Project Scope<a class="headerlink" href="#project-scope" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="project-report">
+<h1>Project Report<a class="headerlink" href="#project-report" title="Permalink to this headline">¶</a></h1>
 <p><em>“The music is not in the notes, but in the silence between.”</em></p>
 <p><em>- Wolfgang Amadeus Mozart</em></p>
-<p>This Report outlines work done for the 2019 Audio Experience Design Installation
-at Imperial College London. Briefly it involved:</p>
+<p>This report outlines work done for the 2019 Audio Experience Design Installation
+at Imperial College London. My contribution to this installation involved:</p>
 <ul class="simple">
-<li>Generating a mixed synthetic and real 3D audio dataset with over 2000 audio clips</li>
+<li>Generating a mixed synthetic and real 3D audio dataset with over <a class="reference external" href="https://www.dropbox.com/sh/g511lxn3aminor6/AAA7dM8wifHG5ejbL_bbTKA_a?dl=0">2000 audio clips</a></li>
 <li>Training a CNN to make heading predictions based on 2 channel audio vectors</li>
 <li>Utilising a probabilistic filter to smooth heading predictions</li>
 <li>Creating an interactive display, with real time audio input, and graphic output</li>
 </ul>
-<p>In total, the result of this project was: an interactive audio localisation system, which utilised
+<p>The final result of work was: an interactive audio localisation system, which utilised
 live binaural recordings to make predictions on sound source location, and then project
 the predicted heading on the floor.</p>
 <div class="figure align-center">
@@ -182,13 +180,16 @@ the predicted heading on the floor.</p>
 </div>
 <div class="section" id="initial-planning">
 <h2>Initial Planning<a class="headerlink" href="#initial-planning" title="Permalink to this headline">¶</a></h2>
-<p>The initial aims for project were submitted in the preliminary document:</p>
+<p>The initial aims for project were submitted in the <a class="reference external" href="https://www.dropbox.com/s/s0ut74x6u8ri9yr/AXP-TeamPingLight.docx?dl=0">preliminary document</a>:</p>
 <ul class="simple">
 <li><strong>Model Human Audio Localisation</strong></li>
 </ul>
 <p>Fulfilling this criteria was the bulk of the installation work. Ultimately, we were successful
 in this endeavour, however, in a simpler case. Humans have the ability to differentiate
-between sounds source coming from: the left, right, front or back. Our system could predict left or right with 76% accuracy.</p>
+between sounds source coming from: left, right, front or back. Our system could predict left or right with 76% accuracy (see figure below).</p>
+<div class="figure align-center">
+<img alt="_images/test_acc.png" src="_images/test_acc.png" />
+</div>
 <ul class="simple">
 <li><strong>Create an Interactive Dark room, where participants can be localised in real time</strong></li>
 </ul>
@@ -211,6 +212,10 @@ our installation which modelled this system computationally.</p>
 the ITD and ILD between front and back are identical. We also took this opportunity to explain
 direction dependent filtering done by our pinna’s and the role of head movement (at the same time explaining
 why our dummy head was rotating around).</p>
+<dl class="docutils">
+<dt>Team coordination tools:</dt>
+<dd>used messenger, Github and Trello</dd>
+</dl>
 </div>
 <div class="section" id="data-generation">
 <h2>Data Generation<a class="headerlink" href="#data-generation" title="Permalink to this headline">¶</a></h2>
@@ -280,31 +285,88 @@ speeds and accelerations modelled from the average human.</p>
 </div></div>
 <div class="section" id="real-data-generation">
 <h3>Real Data Generation<a class="headerlink" href="#real-data-generation" title="Permalink to this headline">¶</a></h3>
+<p>The best data is data taken from the actually test distribution. To generate this dataset, I set up the dummy head and projector as it would be setup on the installation day. I then created
+a display that would point to a random heading and let a python script run that captured a sound recording every 30s. Essentially: the computer would tell the person where to stand, the person
+would move to that location while making sound, then the computer would capture a sound recording.</p>
+<p>The great advantage was that we were capturing the sound features specific to the dummy head we would use in the installation. ITD, IDL and especially the HRTF are greatly affected by the shape of the head,
+body and the ears. The most realistic dataset we could have generated in 3D Tune-In would have utlised the publicly available Kemar HRTF, and then we would have used the Kemar in the installation.
+Instead we generated a fair amount of syntetic data using the incorrect HRTF, and then fine tuned our model using a large amount of real data recorded on the actually head.</p>
 </div>
 <div class="section" id="different-data-types">
 <h3>Different Data Types<a class="headerlink" href="#different-data-types" title="Permalink to this headline">¶</a></h3>
-<p>Data pre processing
-Data all the same
-Normalize but loose distance information. keep the relative information</p>
+<p>Data Recording Length.</p>
+<p>Thought was given to what sampling frequency and bit depth should be used for recording the sound, and what the prediction window
+duration should be.</p>
+<p>For synthetic data, 44100 Hz and 16 bit depth was used to capture recordings in 3D Tune-In. For input sounds, Audacity was used to convert youtube wav files, to the correct sampling freq and mono track format required by
+the toolkit.</p>
+<p>For real data, we initially also used 44100 Hz and 16 bit depth. From testing it seemed the level resolution seemed to be sufficient to determine ILD, but ITD would become more apparent if we increased sampling freq.
+Thus, also conscious of space requirements we opted for a 96000 Hz sampling rate. This simply required changing a few parameters in our code and changing the sampling freq. on the MOTU Ultralight we
+where using to interface with the DPA lapel mics.</p>
+<p>We tested a number of different window lengths but ultimately utilised a 0.005 second window. At 96000 Hz this corresponded to 480 samples. This choice was made based on the size of the ITD feature we
+wanted to capture. Based on the Woodworth’s formula for ITD, we knew that the maximum delay on our dummy head would be around 0.0006 seconds (assuming the sound travels at 340 m/s).
+As our CNN was not integrating information over time, it needed sufficient temporal information to make the correct decision in the moment. To small and the important relative information of the sound pressure
+wave would be loss. To large and the delay features would be obscured. 0.005 seconds seemed right.</p>
+<p><a class="reference external" href="https://www.researchgate.net/figure/Woodworths-Formula-for-Interaural-Time-Delay-ITD-This-model-is-a-simplification-The_fig3_247930825">https://www.researchgate.net/figure/Woodworths-Formula-for-Interaural-Time-Delay-ITD-This-model-is-a-simplification-The_fig3_247930825</a></p>
+<p>Thought was given to what type of sound to use in the data generation. Initially ideas that guided our thinking were:</p>
+<ul class="simple">
+<li><em>Used the same sound.</em> The model would require less capacity to localise one sound as suppose to learning to detect the features on many different types of sound.</li>
+<li><em>Use constant dB sound</em>. If the sound level is kept the same, then the model could learn to predict distance</li>
+</ul>
+<p>With this in mind we decided upon a rain sound. We also thought that there was an interesting psychological aspect as humans perceive rain to be all around us, but the
+computer program would be indifferent.</p>
+<p>INSERT RAIN SOUND VIDEO</p>
+<p>It became apparent though that this data had to many frequency components and was seemingly random. We felt it would be easier to learn to extract ITD and ILD features
+on a simpler wave form. First clapping was tried, we hopped the algorithm would pick up on the clear time and level differences in the impulse peak.</p>
+<p>INSERT CLAPPING VIDEO</p>
+<p>Then Beethoven’s Moonlight Sonata. Compared to rain, Piano sound is relatively pure, consisting mostly of a few main harmonics and their over tones.</p>
+<p>INSERT Moonlight Sonata VIDEO</p>
+<p>Training on the piano music also meant the algorithm would better generate to other “pure tones”, like a constant whistle. Despite such exploration, our algorithm
+performed sub-optimally in the first installation.</p>
+<p>We made a number of changes.</p>
 </div>
-<div class="section" id="cnn-changed-the-regression-to-classifier">
-<h3>CNN, changed the regression to classifier<a class="headerlink" href="#cnn-changed-the-regression-to-classifier" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="improvements">
+<h3>Improvements<a class="headerlink" href="#improvements" title="Permalink to this headline">¶</a></h3>
+<p>From the data point of view we made a number of simplications whihch discarded direction and distance information but enabled use to improve “left or right” prediction.</p>
+<p>1. We created a data set using a pure sinusoid at 1.6 kHz. While this would make it impossible to detect direction dependent features, it would be simpler to for the algorithm to
+extract ITD and ILD.</p>
+<ol class="arabic simple" start="2">
+<li><dl class="first docutils">
+<dt>We normalised and mean centred the data::</dt>
+<dd>INSERT CODE</dd>
+</dl>
+</li>
+</ol>
+<blockquote>
+<div>While this discarded distance information, it meant that improved robustness to level differences and background noise (like that found in the installation)</div></blockquote>
+<p>3. We changed it from regression to classification problem. Previously our CNN was trained to predict source heading on a continuous range between 0 and 2 pi. Now it would simply predict left or
+right.</p>
+<p>4. Added head movement. While we would loose a lot of the angular resolution by just being able to predict left or right, we could compensate by adding heading movement. Moving the head slightly is a
+technique also used by humans to differentiate between front and back sound sources. In Implementation, our dummy head was moved by a 5v servo motor powered by an Arduino Uno.</p>
+<ol class="arabic simple" start="5">
+<li>Added a probabilistic filter. In order to utilise head movement information, predictions needed to be integrated over time. For this, a discrete Bayes filter is utilised.</li>
+</ol>
 </div>
-<div class="section" id="loss-function-not-completely-straight-forward">
-<h3>Loss function not completely straight forward<a class="headerlink" href="#loss-function-not-completely-straight-forward" title="Permalink to this headline">¶</a></h3>
-<p>Haroon,</p>
+<div class="section" id="filtering">
+<h3>Filtering<a class="headerlink" href="#filtering" title="Permalink to this headline">¶</a></h3>
+<p>Initially, filtering of the predictions was done using a simple moving average filter:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="n">INSERT</span> <span class="n">CODE</span>
+</pre></div>
 </div>
-<div class="section" id="display">
-<h3>Display<a class="headerlink" href="#display" title="Permalink to this headline">¶</a></h3>
-<p>Sophie did sound.</p>
-<p>I altered it to add in this filtering.</p>
-<p>Beacuse to noisy data</p>
+<p>Based on the inconsistent performance in the first installation, however, it became clear that a more powerful filter would be needed.
+The final algorithm used a discrete Bayes filter which, while being more robust to spurious predictions, also had the added benefit of integrating predictions over time and accounting for the head
+movement.</p>
+<p>INSERT VIDEO OF CODE IN ACTION.</p>
+<p>We model the sound source as a random particle that experiences a small gaussian drift each time step. The prediction is also modelled using a gaussian with variance 180 deg, to
+reflect the fact the head cannot differentiate front from back.</p>
+<p>Now representing our prediction as a belief between 0 and 2 pi, we felt it would be more accurate to change our display from the single slice showed in the first installation.
+For the Open House, a MaxSP patch was created which wrapped belief distribution around a circle.</p>
+<p>INSERT VIDEO OF MAXSP PATH RUNNING</p>
 </div>
-<div class="section" id="probabilistc-filter">
-<h3>Probabilistc filter<a class="headerlink" href="#probabilistc-filter" title="Permalink to this headline">¶</a></h3>
 </div>
-<div class="section" id="histogram-display">
-<h3>histogram display<a class="headerlink" href="#histogram-display" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="final-outcome">
+<h2>Final Outcome<a class="headerlink" href="#final-outcome" title="Permalink to this headline">¶</a></h2>
+<p>Insert Video’s!
+of Sophie</p>
 <p>[2] Cuevas-Rodríguez M, Picinali L, González-Toledo D, et al., 2019,
 3D Tune-In Toolkit: An open-source library for real-time binaural spatialisation,
 Plos One, Vol:14, Pages:e0211899-e0211899
@@ -314,7 +376,6 @@ See <a class="reference external" href="https://www.dropbox.com/s/s0ut74x6u8ri9y
 <dt>Team coordination tools:</dt>
 <dd>used messenger, Github and Trello</dd>
 </dl>
-</div>
 </div>
 </div>
 

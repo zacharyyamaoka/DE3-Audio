@@ -1,19 +1,19 @@
-Project Scope
+Project Report
 ========================
 
 *“The music is not in the notes, but in the silence between.”*
 
 *- Wolfgang Amadeus Mozart*
 
-This Report outlines work done for the 2019 Audio Experience Design Installation
-at Imperial College London. Briefly it involved:
+This report outlines work done for the 2019 Audio Experience Design Installation
+at Imperial College London. My contribution to this installation involved:
 
-* Generating a mixed synthetic and real 3D audio dataset with over 2000 audio clips
+* Generating a mixed synthetic and real 3D audio dataset with over `2000 audio clips`_
 * Training a CNN to make heading predictions based on 2 channel audio vectors
 * Utilising a probabilistic filter to smooth heading predictions
 * Creating an interactive display, with real time audio input, and graphic output
 
-In total, the result of this project was: an interactive audio localisation system, which utilised
+The final result of work was: an interactive audio localisation system, which utilised
 live binaural recordings to make predictions on sound source location, and then project
 the predicted heading on the floor.
 
@@ -22,25 +22,32 @@ the predicted heading on the floor.
    :align:   center
 
 
+.. _2000 audio clips: https://www.dropbox.com/sh/g511lxn3aminor6/AAA7dM8wifHG5ejbL_bbTKA_a?dl=0
 
 Initial Planning
 -------------------------
 
-The initial aims for project were submitted in the preliminary document:
+Project Aims
+*************
+
+The initial aims for project were submitted in the `preliminary document`_:
 
 -	**Model Human Audio Localisation**
 
 Fulfilling this criteria was the bulk of the installation work. Ultimately, we were successful
 in this endeavour, however, in a simpler case. Humans have the ability to differentiate
-between sounds source coming from: the left, right, front or back. Our system could predict left or right with 76% accuracy.
+between sounds source coming from: left, right, front or back. Our system could predict left or right with 76% accuracy (see figure below).
+
+.. figure::  imgs/test_acc.png
+   :align:   center
 
 
 -	**Create an Interactive Dark room, where participants can be localised in real time**
 
 The initial vision was to locate sounds of human foot steps in a dark room, and then shine a
 a spot light on their location. Early on in the project, it was suggested that utilising
-a projector would simpler then making a custom spotlight. We incorporated this suggestion, and
-through testing found that the projector was bright enough to be seen in a light room.
+a projector would be simpler then making a custom spotlight. We incorporated this suggestion, and
+through testing found that the projector was bright enough to be seen, even in a lit room.
 
 -	**Tie in with educational aspect to explain how our human audio localisation works**
 
@@ -51,16 +58,23 @@ The idea was to first illustrate the incredible computation our brains do: local
 sounds in a 3D environment based purely on two auditory signals.
 
 We then explained the process through which this computation is believed to be done (Duplex theory), utilising
-inter-aural time difference (ITD) and inter-aural level difference (ILD). Once this introduction finished, we proceeded to demonstrate
+inter-aural time difference (ITD) and inter-aural level difference (ILD). We then demonstrated
 our installation which modelled this system computationally.
 
 Inevitably, audience members would walk around the head and see poor performance between front and back localisation.
 
 This would then lead to the discussion of cone of confusion, and we would point out that
-the ITD and ILD between front and back are identical. We also took this opportunity to explain
-direction dependent filtering done by our pinna's and the role of head movement (at the same time explaining
-why our dummy head was rotating around).
+the ITD and ILD between directly in front and back positions are identical. We also took this opportunity to explain
+direction dependent filtering done by our ear pinna's and the role of head movement.
 
+Team Coordination
+************************
+
+Team coordination 
+ used messenger, Github and Trello
+
+
+.. _preliminary document: https://www.dropbox.com/s/s0ut74x6u8ri9yr/AXP-TeamPingLight.docx?dl=0
 
 Data Generation
 -------------------------
@@ -248,6 +262,12 @@ For the Open House, a MaxSP patch was created which wrapped belief distribution 
 INSERT VIDEO OF MAXSP PATH RUNNING
 
 
+
+Final Outcome
+-----------------
+
+Insert Video's!
+of Sophie
 
 [2] Cuevas-Rodríguez M, Picinali L, González-Toledo D, et al., 2019,
 3D Tune-In Toolkit: An open-source library for real-time binaural spatialisation,

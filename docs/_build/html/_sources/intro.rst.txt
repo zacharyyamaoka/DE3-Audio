@@ -1,19 +1,19 @@
-Project Scope
+Project Report
 ========================
 
 *“The music is not in the notes, but in the silence between.”*
 
 *- Wolfgang Amadeus Mozart*
 
-This Report outlines work done for the 2019 Audio Experience Design Installation
-at Imperial College London. Briefly it involved:
+This report outlines work done for the 2019 Audio Experience Design Installation
+at Imperial College London. My contribution to this installation involved:
 
-* Generating a mixed synthetic and real 3D audio dataset with over 2000 audio clips
+* Generating a mixed synthetic and real 3D audio dataset with over `2000 audio clips`_
 * Training a CNN to make heading predictions based on 2 channel audio vectors
 * Utilising a probabilistic filter to smooth heading predictions
 * Creating an interactive display, with real time audio input, and graphic output
 
-In total, the result of this project was: an interactive audio localisation system, which utilised
+The final result of work was: an interactive audio localisation system, which utilised
 live binaural recordings to make predictions on sound source location, and then project
 the predicted heading on the floor.
 
@@ -22,17 +22,21 @@ the predicted heading on the floor.
    :align:   center
 
 
+.. _2000 audio clips: https://www.dropbox.com/sh/g511lxn3aminor6/AAA7dM8wifHG5ejbL_bbTKA_a?dl=0
 
 Initial Planning
 -------------------------
 
-The initial aims for project were submitted in the preliminary document:
+The initial aims for project were submitted in the `preliminary document`_:
 
 -	**Model Human Audio Localisation**
 
 Fulfilling this criteria was the bulk of the installation work. Ultimately, we were successful
 in this endeavour, however, in a simpler case. Humans have the ability to differentiate
-between sounds source coming from: the left, right, front or back. Our system could predict left or right with 76% accuracy.
+between sounds source coming from: left, right, front or back. Our system could predict left or right with 76% accuracy (see figure below).
+
+.. figure::  imgs/test_acc.png
+   :align:   center
 
 
 -	**Create an Interactive Dark room, where participants can be localised in real time**
@@ -61,6 +65,11 @@ the ITD and ILD between front and back are identical. We also took this opportun
 direction dependent filtering done by our pinna's and the role of head movement (at the same time explaining
 why our dummy head was rotating around).
 
+
+Team coordination tools:
+ used messenger, Github and Trello
+
+.. _preliminary document: https://www.dropbox.com/s/s0ut74x6u8ri9yr/AXP-TeamPingLight.docx?dl=0
 
 Data Generation
 -------------------------
@@ -146,40 +155,114 @@ See walker in action:
 Real Data Generation
 *********************
 
+The best data is data taken from the actually test distribution. To generate this dataset, I set up the dummy head and projector as it would be setup on the installation day. I then created
+a display that would point to a random heading and let a python script run that captured a sound recording every 30s. Essentially: the computer would tell the person where to stand, the person
+would move to that location while making sound, then the computer would capture a sound recording.
+
+The great advantage was that we were capturing the sound features specific to the dummy head we would use in the installation. ITD, IDL and especially the HRTF are greatly affected by the shape of the head,
+body and the ears. The most realistic dataset we could have generated in 3D Tune-In would have utlised the publicly available Kemar HRTF, and then we would have used the Kemar in the installation.
+Instead we generated a fair amount of syntetic data using the incorrect HRTF, and then fine tuned our model using a large amount of real data recorded on the actually head.
 
 
 Different Data Types
 *********************
 
-Data pre processing
-Data all the same
-Normalize but loose distance information. keep the relative information
+Data Recording Length.
+
+Thought was given to what sampling frequency and bit depth should be used for recording the sound, and what the prediction window
+duration should be.
+
+For synthetic data, 44100 Hz and 16 bit depth was used to capture recordings in 3D Tune-In. For input sounds, Audacity was used to convert youtube wav files, to the correct sampling freq and mono track format required by
+the toolkit.
+
+For real data, we initially also used 44100 Hz and 16 bit depth. From testing it seemed the level resolution seemed to be sufficient to determine ILD, but ITD would become more apparent if we increased sampling freq.
+Thus, also conscious of space requirements we opted for a 96000 Hz sampling rate. This simply required changing a few parameters in our code and changing the sampling freq. on the MOTU Ultralight we
+where using to interface with the DPA lapel mics.
+
+We tested a number of different window lengths but ultimately utilised a 0.005 second window. At 96000 Hz this corresponded to 480 samples. This choice was made based on the size of the ITD feature we
+wanted to capture. Based on the Woodworth's formula for ITD, we knew that the maximum delay on our dummy head would be around 0.0006 seconds (assuming the sound travels at 340 m/s).
+As our CNN was not integrating information over time, it needed sufficient temporal information to make the correct decision in the moment. To small and the important relative information of the sound pressure
+wave would be loss. To large and the delay features would be obscured. 0.005 seconds seemed right.
+
+https://www.researchgate.net/figure/Woodworths-Formula-for-Interaural-Time-Delay-ITD-This-model-is-a-simplification-The_fig3_247930825
 
 
-CNN, changed the regression to classifier
-*****************************************
+Thought was given to what type of sound to use in the data generation. Initially ideas that guided our thinking were:
 
-Loss function not completely straight forward
-*********************************************
+* *Used the same sound.* The model would require less capacity to localise one sound as suppose to learning to detect the features on many different types of sound.
 
-Haroon,
+* *Use constant dB sound*. If the sound level is kept the same, then the model could learn to predict distance
+
+With this in mind we decided upon a rain sound. We also thought that there was an interesting psychological aspect as humans perceive rain to be all around us, but the
+computer program would be indifferent.
+
+INSERT RAIN SOUND VIDEO
+
+It became apparent though that this data had to many frequency components and was seemingly random. We felt it would be easier to learn to extract ITD and ILD features
+on a simpler wave form. First clapping was tried, we hopped the algorithm would pick up on the clear time and level differences in the impulse peak.
+
+INSERT CLAPPING VIDEO
+
+Then Beethoven's Moonlight Sonata. Compared to rain, Piano sound is relatively pure, consisting mostly of a few main harmonics and their over tones.
+
+INSERT Moonlight Sonata VIDEO
+
+Training on the piano music also meant the algorithm would better generate to other "pure tones", like a constant whistle. Despite such exploration, our algorithm
+performed sub-optimally in the first installation.
+
+We made a number of changes.
 
 
-Display
+
+Improvements
+*************
+
+From the data point of view we made a number of simplications whihch discarded direction and distance information but enabled use to improve "left or right" prediction.
+
+1. We created a data set using a pure sinusoid at 1.6 kHz. While this would make it impossible to detect direction dependent features, it would be simpler to for the algorithm to
+extract ITD and ILD.
+
+2. We normalised and mean centred the data::
+    INSERT CODE
+
+  While this discarded distance information, it meant that improved robustness to level differences and background noise (like that found in the installation)
+
+3. We changed it from regression to classification problem. Previously our CNN was trained to predict source heading on a continuous range between 0 and 2 pi. Now it would simply predict left or
+right.
+
+4. Added head movement. While we would loose a lot of the angular resolution by just being able to predict left or right, we could compensate by adding heading movement. Moving the head slightly is a
+technique also used by humans to differentiate between front and back sound sources. In Implementation, our dummy head was moved by a 5v servo motor powered by an Arduino Uno.
+
+5. Added a probabilistic filter. In order to utilise head movement information, predictions needed to be integrated over time. For this, a discrete Bayes filter is utilised.
+
+Filtering
 *********
 
-Sophie did sound.
+Initially, filtering of the predictions was done using a simple moving average filter::
 
-I altered it to add in this filtering.
+  INSERT CODE
 
-Beacuse to noisy data
+Based on the inconsistent performance in the first installation, however, it became clear that a more powerful filter would be needed.
+The final algorithm used a discrete Bayes filter which, while being more robust to spurious predictions, also had the added benefit of integrating predictions over time and accounting for the head
+movement.
 
-Probabilistc filter
-*********************
+INSERT VIDEO OF CODE IN ACTION.
 
-histogram display
-*******************
+We model the sound source as a random particle that experiences a small gaussian drift each time step. The prediction is also modelled using a gaussian with variance 180 deg, to
+reflect the fact the head cannot differentiate front from back.
 
+Now representing our prediction as a belief between 0 and 2 pi, we felt it would be more accurate to change our display from the single slice showed in the first installation.
+For the Open House, a MaxSP patch was created which wrapped belief distribution around a circle.
+
+INSERT VIDEO OF MAXSP PATH RUNNING
+
+
+
+Final Outcome
+-----------------
+
+Insert Video's!
+of Sophie
 
 [2] Cuevas-Rodríguez M, Picinali L, González-Toledo D, et al., 2019,
 3D Tune-In Toolkit: An open-source library for real-time binaural spatialisation,
