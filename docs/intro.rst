@@ -164,7 +164,7 @@ Thought was given to what type of sound to use in the data generation. Intially 
 
 * *Use constant dB sound*. If the sound level is kept the same, then the model could learn to predict distance
 
-
+To many frequency components made it to complex. Simple sinusoid would make it easier to detect peaks ect..
 
 Data pre processing
 Data all the same
