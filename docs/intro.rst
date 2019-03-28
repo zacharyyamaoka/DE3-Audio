@@ -103,8 +103,8 @@ corresponding localised stereo recording for a point in space relative to the li
 for our purposes we assumed it to be a black box. We were interested only in approximating the inverse function.
 Given a binaural recording, predict the location of the sound relative to the listener. The algorithm for the approximation would be a CNN.
 
-Data Gen. with MaxSP
-*********************
+Data Generation with MaxSP
+***************************
 
 In order to train the CNN, we needed a large dataset with audio clips and corresponding location labels. Rather then generate this
 by hand using the offline recording feature in the 3D Tune-In test app, we accomplished this programmatically.
@@ -129,8 +129,8 @@ ensure it matched with the labels.
 .. _example .txt file: https://github.com/zacharyyamaoka/DE3-Audio/blob/master/data_label/data_rec001.txt
 
 
-Data Gen. with Python
-*********************
+Data Generation with Python
+****************************
 
 In order to boost performance, we wanted to make sure that our training data was as close as possible to the test data. I realised we could still interface
 using OSC but utilise python to create a more natural motion pattern. The natural motion meant that for a given window of data, the source would stay around the same location,
@@ -410,6 +410,7 @@ For the Open House, a MaxSP patch was created which wrapped belief distribution 
     </div>
 
 |
+
 .. _filter.py: https://github.com/zacharyyamaoka/DE3-Audio/blob/master/algo/filter.py
 
 
@@ -418,17 +419,17 @@ Final Outcome
 
 **Initial Set Up**
 
-.. figure::  imgs/v1_head.png
+.. figure::  imgs/v1_head.jpg
    :align:   center
 
  **Audio Experience Day**
 
- .. figure::  imgs/v2_head.png
+ .. figure::  imgs/v2_head.jpg
     :align:   center
 
 **Dyson Open House**
 
-.. figure::  imgs/v3_head.png
+.. figure::  imgs/v3_head.jpg
    :align:   center
 
 **Live Binaural Localization**
@@ -436,10 +437,11 @@ Final Outcome
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-        <iframe src="//www.youtube.com/embed/Itsho3N23gU" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+        <iframe src="//www.youtube.com/embed/GGU_w7pQqGI" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
     </div>
 
 |
+
 
 References
 -----------------

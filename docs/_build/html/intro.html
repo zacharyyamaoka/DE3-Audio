@@ -89,8 +89,8 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#data-generation">Data Generation</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#d-tune-in">3D Tune-In</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#data-gen-with-maxsp">Data Gen. with MaxSP</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#data-gen-with-python">Data Gen. with Python</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-generation-with-maxsp">Data Generation with MaxSP</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#data-generation-with-python">Data Generation with Python</a></li>
 <li class="toctree-l3"><a class="reference internal" href="#real-data-generation">Real Data Generation</a></li>
 </ul>
 </li>
@@ -99,12 +99,13 @@
 <li class="toctree-l3"><a class="reference internal" href="#sound-type">Sound Type</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#convolutional-neural-network">Convolutional Neural Network</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#improvements">Improvements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#convolutional-neural-network">Convolutional Neural Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#improvements">Improvements</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#filtering">Filtering</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="#final-outcome">Final Outcome</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#references">References</a></li>
 </ul>
 </li>
 </ul>
@@ -245,13 +246,13 @@ These advances are being applied to reach state of the art performance in sound 
 was in the method of generating training data and in utilising only two microphones, mimicking the human system, as suppose to a large microphone array.</p>
 <div class="section" id="d-tune-in">
 <h3>3D Tune-In<a class="headerlink" href="#d-tune-in" title="Permalink to this headline">¶</a></h3>
-<p>3D Tune-In is an open-source library for real-time binaural spatialisation. Given a mono audio file, it can generate the
+<p>3D Tune-In is an open-source library for real-time binaural spatialisation [2]. Given a mono audio file, it can generate the
 corresponding localised stereo recording for a point in space relative to the listener. While this mapping is complex,
 for our purposes we assumed it to be a black box. We were interested only in approximating the inverse function.
 Given a binaural recording, predict the location of the sound relative to the listener. The algorithm for the approximation would be a CNN.</p>
 </div>
-<div class="section" id="data-gen-with-maxsp">
-<h3>Data Gen. with MaxSP<a class="headerlink" href="#data-gen-with-maxsp" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="data-generation-with-maxsp">
+<h3>Data Generation with MaxSP<a class="headerlink" href="#data-generation-with-maxsp" title="Permalink to this headline">¶</a></h3>
 <p>In order to train the CNN, we needed a large dataset with audio clips and corresponding location labels. Rather then generate this
 by hand using the offline recording feature in the 3D Tune-In test app, we accomplished this programmatically.</p>
 <p>First, I set a 10 min timer and started an online recording in 3D Tune-In. A script in MaxSP, which interfaced with 3D Tune-In using open sound control (OSC),
@@ -266,13 +267,13 @@ location into a text file (<a class="reference external" href="https://github.co
 <p>After 10 mins, the online recording and the max patch were stopped. To utilise the data, a function was written to clip the front and end of the audio data, to
 ensure it matched with the labels.</p>
 </div>
-<div class="section" id="data-gen-with-python">
-<h3>Data Gen. with Python<a class="headerlink" href="#data-gen-with-python" title="Permalink to this headline">¶</a></h3>
+<div class="section" id="data-generation-with-python">
+<h3>Data Generation with Python<a class="headerlink" href="#data-generation-with-python" title="Permalink to this headline">¶</a></h3>
 <p>In order to boost performance, we wanted to make sure that our training data was as close as possible to the test data. I realised we could still interface
 using OSC but utilise python to create a more natural motion pattern. The natural motion meant that for a given window of data, the source would stay around the same location,
 as suppose to teleporting around the sound scape. Data was recorded in the same manner as described above, but now the sound source was moved
 by simulating a random polar walker. This random walker walks in circles around the listener (similar to how we imagined people would interact with the dummy head) with
-speeds and accelerations similar to the average human [2].</p>
+speeds and accelerations similar to the average human [3].</p>
 <ul class="simple">
 <li>Average walking speed: 1.4 m/s</li>
 <li>Average walking acceleration over short period of time: 0.86 m/s^2</li>
@@ -353,7 +354,7 @@ where using to interface with the DPA lapel mics.</p>
 wanted to capture. Based on the Woodworth’s formula for ITD, we knew that the maximum delay on our dummy head would be around 0.0006 seconds (assuming the sound travels at 340 m/s) [3].
 As our CNN was not integrating information over time, it needed sufficient temporal information to make the correct decision in the moment. Too small, and the important relative information of the sound pressure
 wave would be loss. Too large, and the delay features would be obscured. 0.005 seconds seemed right.</p>
-<p><strong>Head Parameters for Wood Worth Formula [3]</strong></p>
+<p><strong>Head Parameters for Wood Worth Formula [4]</strong></p>
 <div class="figure align-center">
 <img alt="_images/woodworth.png" src="_images/woodworth.png" />
 </div>
@@ -400,8 +401,9 @@ with small random numbers meant, the initial prediction for any audio single wou
 </div><div class="line-block">
 <div class="line"><br /></div>
 </div>
+</div>
 <div class="section" id="improvements">
-<h3>Improvements<a class="headerlink" href="#improvements" title="Permalink to this headline">¶</a></h3>
+<h2>Improvements<a class="headerlink" href="#improvements" title="Permalink to this headline">¶</a></h2>
 <p>We had a number of improvements to improve our audio localisation algorithm’s performance.</p>
 <p>1. We created a data set using a pure sinusoid at 1.6 kHz with background noise. While this would make it impossible to detect direction dependent features, it would be simpler to for the algorithm to
 extract ITD and ILD. The background noise would also make the prediction more robust in real settings.</p>
@@ -444,7 +446,6 @@ technique used by humans to differentiate between front and back sound sources. 
 <ol class="arabic simple" start="5">
 <li>Added a probabilistic filter. In order to utilise head movement information, predictions needed to be integrated over time. For this, a discrete Bayes filter is utilised.</li>
 </ol>
-</div>
 <div class="section" id="filtering">
 <h3>Filtering<a class="headerlink" href="#filtering" title="Permalink to this headline">¶</a></h3>
 <p>Initially, filtering of the predictions was done using a simple moving average filter:</p>
@@ -486,19 +487,40 @@ For the Open House, a MaxSP patch was created which wrapped belief distribution 
 </div>
 <div class="section" id="final-outcome">
 <h2>Final Outcome<a class="headerlink" href="#final-outcome" title="Permalink to this headline">¶</a></h2>
-<p>Insert Video’s!
-of Sophie</p>
+<p><strong>Initial Set Up</strong></p>
+<div class="figure" id="id1">
+<img alt="imgs/v1_head.jpg:align:center" src="imgs/v1_head.jpg:align:center" />
+<p class="caption"><span class="caption-text"><strong>Audio Experience Day</strong></span></p>
+<div class="legend">
+<div class="figure align-center">
+<img alt="_images/v2_head.jpg" src="_images/v2_head.jpg" />
+</div>
+</div>
+</div>
+<p><strong>Dyson Open House</strong></p>
+<div class="figure align-center">
+<img alt="_images/v3_head.jpg" src="_images/v3_head.jpg" />
+</div>
+<p><strong>Live Binaural Localization</strong></p>
+<div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+    <iframe src="//www.youtube.com/embed/Itsho3N23gU" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+</div><div class="line-block">
+<div class="line"><br /></div>
+</div>
+</div>
+<div class="section" id="references">
+<h2>References<a class="headerlink" href="#references" title="Permalink to this headline">¶</a></h2>
 <p>[1] Vera-Diaz, Juan Manuel, et al.
 “Towards End-to-End Acoustic Localization Using Deep Learning: From Audio Signal to Source Position Coordinates.”
 2018, doi:10.20944/preprints201807.0570.v1.</p>
-<p>[2] Lawrence, Peter.
-“What Is the Maximum Walking Acceleration/Deceleration over a Very Short Time Period (E.g., 0.02, 0.1, 0.5 Sec)?”
-ResearchGate, 8 Aug. 2016, www.researchgate.net/post/What_is_the_maximum_walking_acceleration_deceleration_over_a_very_short_time_period_eg_002_01_05_sec.</p>
-<p>[3] Cohen, Michael. (2010). Under-explored dimensions in spatial sound. 10.1145/1900179.1900199.</p>
 <p>[2] Cuevas-Rodríguez M, Picinali L, González-Toledo D, et al., 2019,
 3D Tune-In Toolkit: An open-source library for real-time binaural spatialisation,
-Plos One, Vol:14, Pages:e0211899-e0211899
-´</p>
+Plos One, Vol:14, Pages:e0211899-e0211899</p>
+<p>[3] Lawrence, Peter.
+“What Is the Maximum Walking Acceleration/Deceleration over a Very Short Time Period (E.g., 0.02, 0.1, 0.5 Sec)?”
+ResearchGate, 8 Aug. 2016, www.researchgate.net/post/What_is_the_maximum_walking_acceleration_deceleration_over_a_very_short_time_period_eg_002_01_05_sec.</p>
+<p>[4] Cohen, Michael. (2010). Under-explored dimensions in spatial sound. 10.1145/1900179.1900199.</p>
+<p>´</p>
 </div>
 </div>
 

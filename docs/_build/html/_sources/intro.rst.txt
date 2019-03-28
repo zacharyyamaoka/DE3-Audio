@@ -98,13 +98,13 @@ was in the method of generating training data and in utilising only two micropho
 3D Tune-In
 ************
 
-3D Tune-In is an open-source library for real-time binaural spatialisation. Given a mono audio file, it can generate the
+3D Tune-In is an open-source library for real-time binaural spatialisation [2]. Given a mono audio file, it can generate the
 corresponding localised stereo recording for a point in space relative to the listener. While this mapping is complex,
 for our purposes we assumed it to be a black box. We were interested only in approximating the inverse function.
 Given a binaural recording, predict the location of the sound relative to the listener. The algorithm for the approximation would be a CNN.
 
-Data Gen. with MaxSP
-*********************
+Data Generation with MaxSP
+***************************
 
 In order to train the CNN, we needed a large dataset with audio clips and corresponding location labels. Rather then generate this
 by hand using the offline recording feature in the 3D Tune-In test app, we accomplished this programmatically.
@@ -129,14 +129,14 @@ ensure it matched with the labels.
 .. _example .txt file: https://github.com/zacharyyamaoka/DE3-Audio/blob/master/data_label/data_rec001.txt
 
 
-Data Gen. with Python
-*********************
+Data Generation with Python
+****************************
 
 In order to boost performance, we wanted to make sure that our training data was as close as possible to the test data. I realised we could still interface
 using OSC but utilise python to create a more natural motion pattern. The natural motion meant that for a given window of data, the source would stay around the same location,
 as suppose to teleporting around the sound scape. Data was recorded in the same manner as described above, but now the sound source was moved
 by simulating a random polar walker. This random walker walks in circles around the listener (similar to how we imagined people would interact with the dummy head) with
-speeds and accelerations similar to the average human [2].
+speeds and accelerations similar to the average human [3].
 
 * Average walking speed: 1.4 m/s
 * Average walking acceleration over short period of time: 0.86 m/s^2
@@ -241,7 +241,7 @@ wanted to capture. Based on the Woodworth's formula for ITD, we knew that the ma
 As our CNN was not integrating information over time, it needed sufficient temporal information to make the correct decision in the moment. Too small, and the important relative information of the sound pressure
 wave would be loss. Too large, and the delay features would be obscured. 0.005 seconds seemed right.
 
-**Head Parameters for Wood Worth Formula [3]**
+**Head Parameters for Wood Worth Formula [4]**
 
 .. figure::  imgs/woodworth.png
    :align:   center
@@ -309,7 +309,7 @@ with small random numbers meant, the initial prediction for any audio single wou
 |
 
 Improvements
-*************
+-----------------------------
 
 We had a number of improvements to improve our audio localisation algorithm's performance.
 
@@ -410,26 +410,53 @@ For the Open House, a MaxSP patch was created which wrapped belief distribution 
     </div>
 
 |
+
 .. _filter.py: https://github.com/zacharyyamaoka/DE3-Audio/blob/master/algo/filter.py
 
 
 Final Outcome
 -----------------
 
-Insert Video's!
-of Sophie
+**Initial Set Up**
+
+.. figure::  imgs/v1_head.jpg
+   :align:   center
+
+ **Audio Experience Day**
+
+ .. figure::  imgs/v2_head.jpg
+    :align:   center
+
+**Dyson Open House**
+
+.. figure::  imgs/v3_head.jpg
+   :align:   center
+
+**Live Binaural Localization**
+
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="//www.youtube.com/embed/Itsho3N23gU" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+    </div>
+
+|
+
+References
+-----------------
 
 [1] Vera-Diaz, Juan Manuel, et al.
 “Towards End-to-End Acoustic Localization Using Deep Learning: From Audio Signal to Source Position Coordinates.”
 2018, doi:10.20944/preprints201807.0570.v1.
 
-[2] Lawrence, Peter.
-“What Is the Maximum Walking Acceleration/Deceleration over a Very Short Time Period (E.g., 0.02, 0.1, 0.5 Sec)?”
-ResearchGate, 8 Aug. 2016, www.researchgate.net/post/What_is_the_maximum_walking_acceleration_deceleration_over_a_very_short_time_period_eg_002_01_05_sec.
-
-[3] Cohen, Michael. (2010). Under-explored dimensions in spatial sound. 10.1145/1900179.1900199.
-
 [2] Cuevas-Rodríguez M, Picinali L, González-Toledo D, et al., 2019,
 3D Tune-In Toolkit: An open-source library for real-time binaural spatialisation,
 Plos One, Vol:14, Pages:e0211899-e0211899
+
+[3] Lawrence, Peter.
+“What Is the Maximum Walking Acceleration/Deceleration over a Very Short Time Period (E.g., 0.02, 0.1, 0.5 Sec)?”
+ResearchGate, 8 Aug. 2016, www.researchgate.net/post/What_is_the_maximum_walking_acceleration_deceleration_over_a_very_short_time_period_eg_002_01_05_sec.
+
+[4] Cohen, Michael. (2010). Under-explored dimensions in spatial sound. 10.1145/1900179.1900199.
+
 ´
