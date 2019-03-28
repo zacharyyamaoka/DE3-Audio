@@ -17,13 +17,13 @@ class AudioLocationDataset(Dataset):
     def __init__(self, root="./../data_clip/", csv="./data_clip_label/label.csv", transform=None, use_subset=None):
         self.root = root
         self.csv = pd.read_csv(csv)
-        if use_subset is not None:            
+        if use_subset is not None:
             self.filenames = self.csv['Filename'].tolist()[:use_subset]
             self.labels = self.csv['Label'].tolist()[:use_subset]
         else:
             self.filenames = self.csv['Filename'].tolist()
             self.labels = self.csv['Label'].tolist()
-            
+
         self.transform = transform
 
     def __len__(self):

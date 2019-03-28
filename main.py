@@ -25,7 +25,7 @@ CHUNK_SIZE = int(SAMPLE_RATE*WINDOW_TIME)
 VIZ = True
 # Sender = DataSender(ip="146.169.220.251", port=7400)
 Sender = DataSender(port=7400)
-Head = DummyHead(14141)
+# Head = DummyHead(14141)
 Player = LivePlayer(window = WINDOW_TIME, sample_rate=SAMPLE_RATE, playback=True)
 # Viz = Debugger()
 ALA = ALA()
@@ -58,7 +58,7 @@ while True:
     counter += 1
     # Player.stream_audio(live=True, playback=True)
 
-    Head.look_around()
+    # Head.look_around()
 
     #TODO TUNE drift parameter
     ALA.update(dt) #call each loop
@@ -73,7 +73,8 @@ while True:
         #TODO make it so it just gets the most recent one
         data_vec = data_vec[:CHUNK_SIZE]
 
-        head_yaw = Head.get_rotation()
+        # head_yaw = Head.get_rotation()
+        head_yaw = 0
         ALA.new_reading(data_vec, head_yaw) #update belief
 
 

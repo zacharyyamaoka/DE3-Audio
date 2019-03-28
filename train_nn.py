@@ -23,12 +23,11 @@ from models import *
 
 batch_size = 128
 BIN_N = 2
-
-#train_test_val_split(csv='./data_clip_label/label_full_mon.csv')
-
-train_data = AudioLocationDataset(csv="./data_clip_label/label_train.csv", transform = ToTensor(), use_subset=None, num_bin=BIN_N)
-val_data = AudioLocationDataset(csv="./data_clip_label/label_val.csv", transform = ToTensor(), use_subset=None, num_bin=BIN_N)
-test_data = AudioLocationDataset(csv="./data_clip_label/label_test.csv", transform = ToTensor(), use_subset=None, num_bin=BIN_N)
+data_clip_path = "/Users/zachyamaoka/Documents/de3_audio/data_clip_label/"
+# train_test_val_split(csv=data_clip_path + "label_full_mon.csv")
+train_data = AudioLocationDataset(csv=data_clip_path + "label_train.csv", transform = ToTensor(), use_subset=None, num_bin=BIN_N)
+val_data = AudioLocationDataset(csv=data_clip_path + "label_val.csv", transform = ToTensor(), use_subset=None, num_bin=BIN_N)
+test_data = AudioLocationDataset(csv=data_clip_path + "label_test.csv", transform = ToTensor(), use_subset=None, num_bin=BIN_N)
 
 train_samples = torch.utils.data.DataLoader(dataset=train_data,
                                             batch_size=batch_size,
@@ -62,11 +61,11 @@ model_version = 51
 #plt.show()
 #gg
 
-
 # trained_model_path = "./trained_models/"
-trained_model_path = "/Users/zachyamaoka/Dropbox/de3_audio_data/trained_model/"
+
+trained_model_path = "/Users/zachyamaoka/Dropbox/DE3/AudioExperinceDesign/de3_audio_data/trained_model/"
 model = AudioLocationNN(BIN_N) #instantiate model
-model.load_state_dict(torch.load(trained_model_path + str(model_version) + ".checkpoint"))
+# model.load_state_dict(torch.load(trained_model_path + str(model_version) + ".checkpoint"))
 optimizer = torch.optim.Adam(model.parameters(), lr=max_lr, weight_decay=regularization) #optimizer
 
 def train(epochs, lr_schedule=None):
@@ -173,14 +172,14 @@ def test(samples):
 # for lr in learning_rate:
 #     model = AudioLocationNN() #instantiate model
 #     optimizer = torch.optim.Adam(model.parameters(), lr=lr, weight_decay=regularization) #optimizer
-#min_cost = train(epochs, lr_schedule)
+min_cost = train(epochs, lr_schedule)
 #print("MIN COST: ", min_cost)
 #     loss.append(min_cost)
-
-accuracy = test(test_samples)
-print('Test accuracy', accuracy)
-
-#model_version += epochs
+#
+# accuracy = test(test_samples)
+# print('Test accuracy', accuracy)
+#
+# #model_version += epochs
 #torch.save(model.state_dict(), trained_model_path + str(model_version) + ".checkpoint")
 # plt.plot(learning_rate,loss)
 # plt.pause(4)

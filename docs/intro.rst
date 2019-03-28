@@ -98,7 +98,7 @@ was in the method of generating training data and in utilising only two micropho
 3D Tune-In
 ************
 
-3D Tune-In is an open-source library for real-time binaural spatialisation. Given a mono audio file, it can generate the
+3D Tune-In is an open-source library for real-time binaural spatialisation [2]. Given a mono audio file, it can generate the
 corresponding localised stereo recording for a point in space relative to the listener. While this mapping is complex,
 for our purposes we assumed it to be a black box. We were interested only in approximating the inverse function.
 Given a binaural recording, predict the location of the sound relative to the listener. The algorithm for the approximation would be a CNN.
@@ -121,6 +121,8 @@ location into a text file (`example .txt file`_).
         <iframe src="//www.youtube.com/embed/EC2ePor7Wz0" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
     </div>
 
+|
+
 After 10 mins, the online recording and the max patch were stopped. To utilise the data, a function was written to clip the front and end of the audio data, to
 ensure it matched with the labels.
 
@@ -134,7 +136,7 @@ In order to boost performance, we wanted to make sure that our training data was
 using OSC but utilise python to create a more natural motion pattern. The natural motion meant that for a given window of data, the source would stay around the same location,
 as suppose to teleporting around the sound scape. Data was recorded in the same manner as described above, but now the sound source was moved
 by simulating a random polar walker. This random walker walks in circles around the listener (similar to how we imagined people would interact with the dummy head) with
-speeds and accelerations similar to the average human [2].
+speeds and accelerations similar to the average human [3].
 
 * Average walking speed: 1.4 m/s
 * Average walking acceleration over short period of time: 0.86 m/s^2
@@ -167,12 +169,14 @@ See code for walker::
               self.r_dot = 0
 
 See walker in action:
+
 .. raw:: html
 
     <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
         <iframe src="//www.youtube.com/embed/z80D9Xikr2k" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
     </div>
 
+|
 
 Real Data Generation
 *********************
@@ -181,33 +185,70 @@ The best data is data taken from the actually test distribution. To generate thi
 a display that would point to a random heading and let a python script run that captured a sound recording every 30s. Essentially: the computer would tell the person where to stand, the person
 would move to that location while making sound, then the computer would capture a sound recording.
 
-The great advantage was that we were capturing the sound features specific to the dummy head we would use in the installation. ITD, IDL and especially the HRTF are greatly affected by the shape of the head,
-body and the ears. The most realistic dataset we could have generated in 3D Tune-In would have utlised the publicly available Kemar HRTF, and then we would have used the Kemar in the installation.
-Instead we generated a fair amount of syntetic data using the incorrect HRTF, and then fine tuned our model using a large amount of real data recorded on the actually head.
+**Screen which Pointed in Direction to Stand**
+
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="//www.youtube.com/embed/8DLFwBuzAxI" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+    </div>
+
+|
+
+**Following the Arrow Around the Head While Making Noise**
+
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="//www.youtube.com/embed/zB7vwWIljaw" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+    </div>
+
+|
+
+The great advantage in this approach was that data contained features specific to the dummy head we would use in the installation. ITD, IDL and especially the HRTF are greatly affected by the shape of the head,
+body and the ears. The most realistic dataset we could have generated in 3D Tune-In would have utilised the publicly available Kemar HRTF coupled with using the real Kemar in the installation.
+Instead we generated a fair amount of synthetic data using the incorrect HRTF, and then fine tuned our model using a large amount of real data recorded on the actually head.
 
 
-Different Data Types
-*********************
+Data Types
+-------------------
 
-Data Recording Length.
+Data Resolution and Length
+****************************
 
-Thought was given to what sampling frequency and bit depth should be used for recording the sound, and what the prediction window
+Thought was given to: what sampling frequency and bit depth should be used for recording the sound, and what the prediction window
 duration should be.
 
-For synthetic data, 44100 Hz and 16 bit depth was used to capture recordings in 3D Tune-In. For input sounds, Audacity was used to convert youtube wav files, to the correct sampling freq and mono track format required by
+For synthetic data, 44100 Hz and 16 bit depth was used to capture recordings in 3D Tune-In. For input sounds, Audacity was used to convert Youtube wav files, to the correct sampling frequency and mono track format required by
 the toolkit.
 
-For real data, we initially also used 44100 Hz and 16 bit depth. From testing it seemed the level resolution seemed to be sufficient to determine ILD, but ITD would become more apparent if we increased sampling freq.
-Thus, also conscious of space requirements we opted for a 96000 Hz sampling rate. This simply required changing a few parameters in our code and changing the sampling freq. on the MOTU Ultralight we
+For real data, we initially also used 44100 Hz and 16 bit depth. From testing, it seemed the level resolution seemed was sufficiently fine to determine ILD, but ITD would become more apparent if we increased sampling frequency.
+Thus, also conscious of memory space and realtime requirements, we opted for a 96000 Hz sampling rate. This simply required changing a few parameters in our code and adjusting the sampling frequency on the MOTU Ultralight we
 where using to interface with the DPA lapel mics.
 
-We tested a number of different window lengths but ultimately utilised a 0.005 second window. At 96000 Hz this corresponded to 480 samples. This choice was made based on the size of the ITD feature we
-wanted to capture. Based on the Woodworth's formula for ITD, we knew that the maximum delay on our dummy head would be around 0.0006 seconds (assuming the sound travels at 340 m/s).
-As our CNN was not integrating information over time, it needed sufficient temporal information to make the correct decision in the moment. To small and the important relative information of the sound pressure
-wave would be loss. To large and the delay features would be obscured. 0.005 seconds seemed right.
+**Audio Clips - 480 samples at 96000 Hz**
 
-https://www.researchgate.net/figure/Woodworths-Formula-for-Interaural-Time-Delay-ITD-This-model-is-a-simplification-The_fig3_247930825
+.. raw:: html
 
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="//www.youtube.com/embed/o-H32zXB1Ms" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+    </div>
+
+|
+
+We tested a number of different window lengths for prediction but ultimately utilised a 0.005 second window. At 96000 Hz this corresponded to 480 samples. This choice was made based on the size of the ITD feature we
+wanted to capture. Based on the Woodworth's formula for ITD, we knew that the maximum delay on our dummy head would be around 0.0006 seconds (assuming the sound travels at 340 m/s) [3].
+As our CNN was not integrating information over time, it needed sufficient temporal information to make the correct decision in the moment. Too small, and the important relative information of the sound pressure
+wave would be loss. Too large, and the delay features would be obscured. 0.005 seconds seemed right.
+
+**Head Parameters for Wood Worth Formula [4]**
+
+.. figure::  imgs/woodworth.png
+   :align:   center
+
+
+Sound Type
+**************
 
 Thought was given to what type of sound to use in the data generation. Initially ideas that guided our thinking were:
 
@@ -215,45 +256,110 @@ Thought was given to what type of sound to use in the data generation. Initially
 
 * *Use constant dB sound*. If the sound level is kept the same, then the model could learn to predict distance
 
-With this in mind we decided upon a rain sound. We also thought that there was an interesting psychological aspect as humans perceive rain to be all around us, but the
+With this in mind we decided upon a rain sound. Rain is an extremely rich signal, and we thought that there was an interesting psychological aspect as humans perceive rain to be all around us, but the
 computer program would be indifferent.
 
-INSERT RAIN SOUND VIDEO
+.. raw:: html
 
-It became apparent though that this data had to many frequency components and was seemingly random. We felt it would be easier to learn to extract ITD and ILD features
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="//www.youtube.com/embed/PiHM4WdmQ4o" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+    </div>
+
+|
+
+It became apparent that this data had to many frequency components (essentially white noise) and was seemingly random. We felt it would be easier to learn to extract ITD and ILD features
 on a simpler wave form. First clapping was tried, we hopped the algorithm would pick up on the clear time and level differences in the impulse peak.
 
-INSERT CLAPPING VIDEO
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="//www.youtube.com/embed/cxy7wylUFVw" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+    </div>
+
+|
 
 Then Beethoven's Moonlight Sonata. Compared to rain, Piano sound is relatively pure, consisting mostly of a few main harmonics and their over tones.
 
-INSERT Moonlight Sonata VIDEO
+.. raw:: html
 
-Training on the piano music also meant the algorithm would better generate to other "pure tones", like a constant whistle. Despite such exploration, our algorithm
-performed sub-optimally in the first installation.
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="//www.youtube.com/embed/wGWhmaOE9mM" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+    </div>
 
-We made a number of changes.
+|
 
+Training on the piano music also meant the algorithm would better generate to other "pure tones", like a constant whistle.
 
+Convolutional Neural Network
+-----------------------------
+
+Once the data had been collected, the CNN could be trained. First we over fit on a small amount of data to validate the model. Then training was
+done using the full dataset. Interestingly we had to start with a high learning rate because the model starts in a local minimum. By initialising the weights with
+with small random numbers meant, the initial prediction for any audio single would be a small random number (around 0 deg). This is a good starting point, but learning to predict
++90 or -90 deg would actually minimise overall error. This is because the model cannot differentiate between front and back (cone of confusion).
+
+**Training the CNN with Audio Data**
+
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="//www.youtube.com/embed/F0cH7pZOYvQ" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+    </div>
+
+|
 
 Improvements
-*************
+-----------------------------
 
-From the data point of view we made a number of simplications whihch discarded direction and distance information but enabled use to improve "left or right" prediction.
+We had a number of improvements to improve our audio localisation algorithm's performance.
 
-1. We created a data set using a pure sinusoid at 1.6 kHz. While this would make it impossible to detect direction dependent features, it would be simpler to for the algorithm to
-extract ITD and ILD.
+1. We created a data set using a pure sinusoid at 1.6 kHz with background noise. While this would make it impossible to detect direction dependent features, it would be simpler to for the algorithm to
+extract ITD and ILD. The background noise would also make the prediction more robust in real settings.
+
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="//www.youtube.com/embed/ThffOQjV17k" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+    </div>
+
+|
 
 2. We normalised and mean centred the data::
-    INSERT CODE
 
-  While this discarded distance information, it meant that improved robustness to level differences and background noise (like that found in the installation)
+    audio = audio[:, start:(start+chunk)]
 
-3. We changed it from regression to classification problem. Previously our CNN was trained to predict source heading on a continuous range between 0 and 2 pi. Now it would simply predict left or
+    #center data
+    mean = np.mean(audio)
+    audio -= mean
+
+    #normalize
+
+    max = np.max(np.abs(audio))
+    audio /= max
+
+While this removed distance information, it gave improved robustness to level differences and background noise (like that found in the installation)
+
+3. We changed the localisation task from regression to classification problem. Previously our CNN was trained to predict source heading on a continuous range between 0 and 2 pi. Now it would simply predict left or
 right.
 
-4. Added head movement. While we would loose a lot of the angular resolution by just being able to predict left or right, we could compensate by adding heading movement. Moving the head slightly is a
-technique also used by humans to differentiate between front and back sound sources. In Implementation, our dummy head was moved by a 5v servo motor powered by an Arduino Uno.
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="//www.youtube.com/embed/dCLHqfuBEFc" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+    </div>
+
+|
+
+4. Added head movement. While previously mentioned changes lowered our angular resolution, this decrease could be offset by adding head movement. Slight head movement is a
+technique used by humans to differentiate between front and back sound sources. In implementation, our dummy head was moved by a 5v servo motor powered by an Arduino Uno.
+
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="//www.youtube.com/embed/NIZqMI7LmdQ" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+    </div>
+
+|
 
 5. Added a probabilistic filter. In order to utilise head movement information, predictions needed to be integrated over time. For this, a discrete Bayes filter is utilised.
 
@@ -262,40 +368,94 @@ Filtering
 
 Initially, filtering of the predictions was done using a simple moving average filter::
 
-  INSERT CODE
+  def filter(self, last_theta_mu, last_theta_var):
 
-Based on the inconsistent performance in the first installation, however, it became clear that a more powerful filter would be needed.
-The final algorithm used a discrete Bayes filter which, while being more robust to spurious predictions, also had the added benefit of integrating predictions over time and accounting for the head
-movement.
+        # simple moving average filter.
+        last_theta_mu = last_theta_mu % (2 * np.pi) #modulo
+        self.theta_mu[self.pointer] = last_theta_mu
+        self.theta_var[self.pointer] = last_theta_var
 
-INSERT VIDEO OF CODE IN ACTION.
+        self.pointer += 1
+        self.pointer = self.pointer % self.size #add wrap around
+
+        curr_theta_mu = np.mean(self.theta_mu)
+        curr_theta_var = np.var(self.theta_var)
+
+        return curr_theta_mu, curr_theta_var
+
+In order to achieve more consistent performance, however, it became clear that a more powerful filter would be needed.
+The final algorithm used a discrete Bayes filter which is more robust to spurious predictions and can
+integrate predictions over time to account for head movement.
+
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="//www.youtube.com/embed/eWNau435xrc" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+    </div>
+
+|
 
 We model the sound source as a random particle that experiences a small gaussian drift each time step. The prediction is also modelled using a gaussian with variance 180 deg, to
 reflect the fact the head cannot differentiate front from back.
 
+Find relevant code in file `filter.py`_
+
 Now representing our prediction as a belief between 0 and 2 pi, we felt it would be more accurate to change our display from the single slice showed in the first installation.
 For the Open House, a MaxSP patch was created which wrapped belief distribution around a circle.
 
-INSERT VIDEO OF MAXSP PATH RUNNING
+.. raw:: html
 
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="//www.youtube.com/embed/Itsho3N23gU" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+    </div>
+
+|
+.. _filter.py: https://github.com/zacharyyamaoka/DE3-Audio/blob/master/algo/filter.py
 
 
 Final Outcome
 -----------------
 
-Insert Video's!
-of Sophie
+**Initial Set Up**
+
+.. figure::  imgs/v1_head.png
+   :align:   center
+
+ **Audio Experience Day**
+
+ .. figure::  imgs/v2_head.png
+    :align:   center
+
+**Dyson Open House**
+
+.. figure::  imgs/v3_head.png
+   :align:   center
+
+**Live Binaural Localization**
+
+.. raw:: html
+
+    <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
+        <iframe src="//www.youtube.com/embed/Itsho3N23gU" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+    </div>
+
+|
+
+References
+-----------------
 
 [1] Vera-Diaz, Juan Manuel, et al.
 “Towards End-to-End Acoustic Localization Using Deep Learning: From Audio Signal to Source Position Coordinates.”
 2018, doi:10.20944/preprints201807.0570.v1.
 
-[2] Lawrence, Peter.
-“What Is the Maximum Walking Acceleration/Deceleration over a Very Short Time Period (E.g., 0.02, 0.1, 0.5 Sec)?”
- ResearchGate, 8 Aug. 2016, www.researchgate.net/post/What_is_the_maximum_walking_acceleration_deceleration_over_a_very_short_time_period_eg_002_01_05_sec.
-
-
 [2] Cuevas-Rodríguez M, Picinali L, González-Toledo D, et al., 2019,
 3D Tune-In Toolkit: An open-source library for real-time binaural spatialisation,
 Plos One, Vol:14, Pages:e0211899-e0211899
+
+[3] Lawrence, Peter.
+“What Is the Maximum Walking Acceleration/Deceleration over a Very Short Time Period (E.g., 0.02, 0.1, 0.5 Sec)?”
+ResearchGate, 8 Aug. 2016, www.researchgate.net/post/What_is_the_maximum_walking_acceleration_deceleration_over_a_very_short_time_period_eg_002_01_05_sec.
+
+[4] Cohen, Michael. (2010). Under-explored dimensions in spatial sound. 10.1145/1900179.1900199.
+
 ´

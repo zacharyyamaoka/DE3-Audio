@@ -38,7 +38,7 @@ class PositionFilter():
 
         curr_theta_mu = np.mean(self.theta_mu)
         curr_theta_var = np.var(self.theta_var)
-        curr_theta_var = np.mean(self.theta_var)
+        # curr_theta_var = np.mean(self.theta_var)
 
         return curr_theta_mu, curr_theta_var
 

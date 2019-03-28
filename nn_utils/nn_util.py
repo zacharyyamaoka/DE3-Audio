@@ -11,6 +11,7 @@ import torch
 class AudioLocationDataset(Dataset):
     def __init__(self, root="./../data_clip/", csv="./data_clip_label/label.csv", transform=None, use_subset=None, num_bin = 2):
         self.root = root
+        self.root = "/Users/zachyamaoka/Dropbox/DE3/AudioExperinceDesign/de3_audio_data/data_clip/"
         self.csv = pd.read_csv(csv)
         if use_subset is not None:
             self.filenames = self.csv['Filename'].tolist()[:use_subset]

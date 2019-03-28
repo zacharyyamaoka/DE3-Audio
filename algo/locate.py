@@ -14,7 +14,7 @@ class SoundLocalizer():
         print("SoundLocalizer Init")
         self.BIN_N = 2
         self.model = AudioLocationNN(self.BIN_N)
-        zach_path = "/Users/zachyamaoka/Dropbox/de3_audio_data/trained_model/"
+        zach_path = "/Users/zachyamaoka/Dropbox/DE3/AudioExperinceDesign/de3_audio_data/trained_model/"
         file = "51.checkpoint"
         self.model.load_state_dict(torch.load(zach_path+file))
 
