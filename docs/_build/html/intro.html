@@ -99,7 +99,10 @@
 <li class="toctree-l3"><a class="reference internal" href="#sound-type">Sound Type</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#convolutional-neural-network">Convolutional Neural Network</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#convolutional-neural-network">Convolutional Neural Network</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#loss-function">Loss Function</a></li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="#improvements">Improvements</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#filtering">Filtering</a></li>
 </ul>
@@ -184,9 +187,8 @@ at Imperial College London. My contribution to this installation involved:</p>
 <li>Utilising a probabilistic filter to smooth heading predictions</li>
 <li>Creating an interactive display, with real time audio input, and graphic output</li>
 </ul>
-<p>The final result of work was: an interactive audio localisation system, which utilised
-live binaural recordings to make predictions on sound source location, and then project
-the predicted heading on the floor.</p>
+<p>The final result of work was: an interactive audio localisation installation, which utilised
+live binaural recordings to make predictions on sound source location.</p>
 <p><strong>Dummy Head with two DPA Lapel Mics</strong></p>
 <div class="figure align-center">
 <img alt="_images/dummy_head_side.jpg" src="_images/dummy_head_side.jpg" />
@@ -201,7 +203,7 @@ the predicted heading on the floor.</p>
 </ul>
 <p>Fulfilling this criteria was the bulk of the installation work. Ultimately, we were successful
 in this endeavour, however, in a simpler case. Humans have the ability to differentiate
-between sounds source coming from: left, right, front or back. Our system could predict left or right with 76% accuracy (see figure below).</p>
+between sounds source coming from: left, right, front or back. Our algorithm could predict left or right with 76% accuracy (see figure below).</p>
 <p><strong>Test Accuracy of Algorithm</strong></p>
 <div class="figure align-center">
 <img alt="_images/test_acc.png" src="_images/test_acc.png" />
@@ -212,7 +214,7 @@ between sounds source coming from: left, right, front or back. Our system could 
 <p>The initial vision was to locate sounds of human foot steps in a dark room, and then shine a
 a spot light on their location. Early on in the project, it was suggested that utilising
 a projector would be simpler then making a custom spotlight. We incorporated this suggestion, and
-through testing found that the projector was bright enough to be seen, even in a lit room.</p>
+through testing found that the projector was bright to be used in a lit room.</p>
 <ul class="simple">
 <li><em>Tie in with educational aspect to explain how our human audio localisation works</em></li>
 </ul>
@@ -223,8 +225,8 @@ sounds in a 3D environment based purely on two auditory signals.</p>
 <p>We then explained the process through which this computation is believed to be done (Duplex theory), utilising
 inter-aural time difference (ITD) and inter-aural level difference (ILD). We then demonstrated
 our installation which modelled this system computationally.</p>
-<p>Inevitably, audience members would walk around the head and see poor performance between front and back localisation.</p>
-<p>This would then lead to the discussion of cone of confusion, and we would point out that
+<p>Inevitably, audience members would walk around the head and see poor performance between front and back localisation.
+This would then lead to the discussion of cone of confusion, and we would point out that
 the ITD and ILD between directly in front and back positions are identical. We also took this opportunity to explain
 direction dependent filtering done by our ear pinna’s and the role of head movement.</p>
 </div>
@@ -242,21 +244,22 @@ direction dependent filtering done by our ear pinna’s and the role of head mov
 <p>The field of <em>machine listening</em> is hot. Previous work has utilised large microphone arrays (5+) with custom algorithms and hand picked features [1].
 Recent advances in machine learning, however, have made it possible to learn extremely complex functions from data.
 These advances are being applied to reach state of the art performance in sound localisation [1].</p>
-<p>In line with previous work, our team aimed to train a convolutional neural network (CNN) to predict sound location based on time series audio data. Where we hoped innovate and learn
-was in the method of generating training data and in utilising only two microphones, mimicking the human system, as suppose to a large microphone array.</p>
+<p>In line with previous work, our team aimed to train a convolutional neural network (CNN) to predict sound location based on time series audio data. We were most
+interested, however, in the method of which we would generate training data, and in utilising only two microphones (mimicking the human system) as suppose to a large microphone array.</p>
 <div class="section" id="d-tune-in">
 <h3>3D Tune-In<a class="headerlink" href="#d-tune-in" title="Permalink to this headline">¶</a></h3>
 <p>3D Tune-In is an open-source library for real-time binaural spatialisation [2]. Given a mono audio file, it can generate the
-corresponding localised stereo recording for a point in space relative to the listener. While this mapping is complex,
-for our purposes we assumed it to be a black box. We were interested only in approximating the inverse function.
-Given a binaural recording, predict the location of the sound relative to the listener. The algorithm for the approximation would be a CNN.</p>
+corresponding spatialised stereo recording for a point in space relative to the listener. While this mapping is complex,
+for our purposes we assumed it to be a black box. Our goal was to approximate the inverse function.
+Given a binaural recording, predict the location of the sound relative to the listener. This approximation could be done using a
+convolutional neural network (CNN).</p>
 </div>
 <div class="section" id="data-generation-with-maxsp">
 <h3>Data Generation with MaxSP<a class="headerlink" href="#data-generation-with-maxsp" title="Permalink to this headline">¶</a></h3>
 <p>In order to train the CNN, we needed a large dataset with audio clips and corresponding location labels. Rather then generate this
 by hand using the offline recording feature in the 3D Tune-In test app, we accomplished this programmatically.</p>
-<p>First, I set a 10 min timer and started an online recording in 3D Tune-In. A script in MaxSP, which interfaced with 3D Tune-In using open sound control (OSC),
-uniformly iterate through various distance and headings, and moved the sound source. As the recording ran, the max patch would write the sound source’s current
+<p>First, we set a 10 minute timer and started an online recording in 3D Tune-In. A script in MaxSP, which interfaced with 3D Tune-In using open sound control (OSC), then
+uniformly iterated through various distance and headings, and moved the sound source. As the recording ran, the max patch would write the sound source’s current
 location into a text file (<a class="reference external" href="https://github.com/zacharyyamaoka/DE3-Audio/blob/master/data_label/data_rec001.txt">example .txt file</a>).</p>
 <p><strong>Moving Sound Source using MaxSP</strong></p>
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
@@ -269,8 +272,8 @@ ensure it matched with the labels.</p>
 </div>
 <div class="section" id="data-generation-with-python">
 <h3>Data Generation with Python<a class="headerlink" href="#data-generation-with-python" title="Permalink to this headline">¶</a></h3>
-<p>In order to boost performance, we wanted to make sure that our training data was as close as possible to the test data. I realised we could still interface
-using OSC but utilise python to create a more natural motion pattern. The natural motion meant that for a given window of data, the source would stay around the same location,
+<p>In order to boost performance, we wanted to make sure that our training data was as close as possible to the test data. We realised we could still interface with the toolkit
+using OSC but utilise Python to create a more natural motion pattern. Having natural motion meant that for a given window of data, the source would stay around the same location,
 as suppose to teleporting around the sound scape. Data was recorded in the same manner as described above, but now the sound source was moved
 by simulating a random polar walker. This random walker walks in circles around the listener (similar to how we imagined people would interact with the dummy head) with
 speeds and accelerations similar to the average human [3].</p>
@@ -313,35 +316,36 @@ speeds and accelerations similar to the average human [3].</p>
 </div>
 <div class="section" id="real-data-generation">
 <h3>Real Data Generation<a class="headerlink" href="#real-data-generation" title="Permalink to this headline">¶</a></h3>
-<p>The best data is data taken from the actually test distribution. To generate this dataset, I set up the dummy head and projector as it would be setup on the installation day. I then created
-a display that would point to a random heading and let a python script run that captured a sound recording every 30s. Essentially: the computer would tell the person where to stand, the person
+<p>The best data is data taken from the actually test distribution. To generate this dataset, we set up the dummy head and projector in the same room and configuration as it would shown on the demo day.
+I then created a display that would point to a random heading and let a Python script run that captured a sound recording every 30s. Essentially: the computer would tell the person where to stand, the person
 would move to that location while making sound, then the computer would capture a sound recording.</p>
-<p><strong>Screen which Pointed in Direction to Stand</strong></p>
+<p><strong>Heading Display</strong></p>
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
     <iframe src="//www.youtube.com/embed/8DLFwBuzAxI" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
 </div><div class="line-block">
 <div class="line"><br /></div>
 </div>
-<p><strong>Following the Arrow Around the Head While Making Noise</strong></p>
+<p><strong>Following Arrow Around Head while Making Noise</strong></p>
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
-    <iframe src="//www.youtube.com/embed/zB7vwWIljaw" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
+    <iframe src="//www.youtube.com/embed/4Zyq-jSEsto" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
 </div><div class="line-block">
 <div class="line"><br /></div>
 </div>
 <p>The great advantage in this approach was that data contained features specific to the dummy head we would use in the installation. ITD, IDL and especially the HRTF are greatly affected by the shape of the head,
-body and the ears. The most realistic dataset we could have generated in 3D Tune-In would have utilised the publicly available Kemar HRTF coupled with using the real Kemar in the installation.
-Instead we generated a fair amount of synthetic data using the incorrect HRTF, and then fine tuned our model using a large amount of real data recorded on the actually head.</p>
+body and the ears. The most realistic dataset we could have generated in 3D Tune-In would have utilised the publicly available Kemar HRTF and the real Kemar in the installation.
+Instead we generated a fair amount of synthetic data using the incorrect HRTF, and then fine tuned our model using a large amount of real data recorded on the actually head. Such an approach also
+allowed us the capture room specific reverb features.</p>
 </div>
 </div>
 <div class="section" id="data-types">
 <h2>Data Types<a class="headerlink" href="#data-types" title="Permalink to this headline">¶</a></h2>
 <div class="section" id="data-resolution-and-length">
 <h3>Data Resolution and Length<a class="headerlink" href="#data-resolution-and-length" title="Permalink to this headline">¶</a></h3>
-<p>Thought was given to: what sampling frequency and bit depth should be used for recording the sound, and what the prediction window
-duration should be.</p>
+<p>We considered the sampling frequency and bit depth used for the audio, as well as the duration of the prediction window (number of samples).</p>
 <p>For synthetic data, 44100 Hz and 16 bit depth was used to capture recordings in 3D Tune-In. For input sounds, Audacity was used to convert Youtube wav files, to the correct sampling frequency and mono track format required by
 the toolkit.</p>
-<p>For real data, we initially also used 44100 Hz and 16 bit depth. From testing, it seemed the level resolution seemed was sufficiently fine to determine ILD, but ITD would become more apparent if we increased sampling frequency.
+<p>For real data, we initially also used 44100 Hz and 16 bit depth. From testing, we visually confirmed that level resolution was sufficiently fine to determine ILD, but it was clear ITD features would improve if we increased sampling frequency.
+For sources close to the listener (near-field whisper), level differences are pronounced as the sound level decreases by 6 dB for every doubling of distance. The maximum time delay however, at 44100 Hz, would be just 26 samples.
 Thus, also conscious of memory space and realtime requirements, we opted for a 96000 Hz sampling rate. This simply required changing a few parameters in our code and adjusting the sampling frequency on the MOTU Ultralight we
 where using to interface with the DPA lapel mics.</p>
 <p><strong>Audio Clips - 480 samples at 96000 Hz</strong></p>
@@ -350,10 +354,10 @@ where using to interface with the DPA lapel mics.</p>
 </div><div class="line-block">
 <div class="line"><br /></div>
 </div>
-<p>We tested a number of different window lengths for prediction but ultimately utilised a 0.005 second window. At 96000 Hz this corresponded to 480 samples. This choice was made based on the size of the ITD feature we
-wanted to capture. Based on the Woodworth’s formula for ITD, we knew that the maximum delay on our dummy head would be around 0.0006 seconds (assuming the sound travels at 340 m/s) [3].
+<p>We tested a number of different window lengths for prediction but ultimately choose a 0.005 second window. At 96000 Hz this corresponded to 480 samples. This choice was made based on the size of the ITD feature we
+wanted to capture. Based on the Woodworth’s formula for ITD, we knew that the maximum delay on our dummy head would be approximately 0.0006 seconds (assuming the sound travels at 340 m/s) [3].
 As our CNN was not integrating information over time, it needed sufficient temporal information to make the correct decision in the moment. Too small, and the important relative information of the sound pressure
-wave would be loss. Too large, and the delay features would be obscured. 0.005 seconds seemed right.</p>
+wave would be loss. Too large, and the delay features would be obscured. 0.005 seconds seemed right and achieved higher test accuracy compared to larger window sizes.</p>
 <p><strong>Head Parameters for Wood Worth Formula [4]</strong></p>
 <div class="figure align-center">
 <img alt="_images/woodworth.png" src="_images/woodworth.png" />
@@ -364,47 +368,66 @@ wave would be loss. Too large, and the delay features would be obscured. 0.005 s
 <p>Thought was given to what type of sound to use in the data generation. Initially ideas that guided our thinking were:</p>
 <ul class="simple">
 <li><em>Used the same sound.</em> The model would require less capacity to localise one sound as suppose to learning to detect the features on many different types of sound.</li>
-<li><em>Use constant dB sound</em>. If the sound level is kept the same, then the model could learn to predict distance</li>
+<li><em>Use constant dB sound</em>. If the sound level were kept the same, then the model could learn to predict distance</li>
 </ul>
-<p>With this in mind we decided upon a rain sound. Rain is an extremely rich signal, and we thought that there was an interesting psychological aspect as humans perceive rain to be all around us, but the
+<p>With this in mind we decided upon a rain sound. Rain is an extremely rich signal. There was also an interesting psychological aspect as humans perceive rain to be all around us, but the
 computer program would be indifferent.</p>
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
     <iframe src="//www.youtube.com/embed/PiHM4WdmQ4o" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
 </div><div class="line-block">
 <div class="line"><br /></div>
 </div>
-<p>It became apparent that this data had to many frequency components (essentially white noise) and was seemingly random. We felt it would be easier to learn to extract ITD and ILD features
+<p>It became apparent that this data had too many frequency components (essentially white noise) that were obscuring the ITD features. We felt it would be easier to learn to extract ITD and ILD features
 on a simpler wave form. First clapping was tried, we hopped the algorithm would pick up on the clear time and level differences in the impulse peak.</p>
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
     <iframe src="//www.youtube.com/embed/cxy7wylUFVw" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
 </div><div class="line-block">
 <div class="line"><br /></div>
 </div>
-<p>Then Beethoven’s Moonlight Sonata. Compared to rain, Piano sound is relatively pure, consisting mostly of a few main harmonics and their over tones.</p>
+<p>Then Beethoven’s Moonlight Sonata. Compared to rain, piano sound is relatively pure, consisting mostly of a few main harmonics and their over tones.</p>
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
     <iframe src="//www.youtube.com/embed/wGWhmaOE9mM" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
 </div><div class="line-block">
 <div class="line"><br /></div>
 </div>
-<p>Training on the piano music also meant the algorithm would better generate to other “pure tones”, like a constant whistle.</p>
+<p>Training on the piano music also meant the algorithm would better generalise to other “pure tones”, like a constant whistle.</p>
 </div>
 </div>
 <div class="section" id="convolutional-neural-network">
 <h2>Convolutional Neural Network<a class="headerlink" href="#convolutional-neural-network" title="Permalink to this headline">¶</a></h2>
 <p>Once the data had been collected, the CNN could be trained. First we over fit on a small amount of data to validate the model. Then training was
-done using the full dataset. Interestingly we had to start with a high learning rate because the model starts in a local minimum. By initialising the weights with
-with small random numbers meant, the initial prediction for any audio single would be a small random number (around 0 deg). This is a good starting point, but learning to predict
-+90 or -90 deg would actually minimise overall error. This is because the model cannot differentiate between front and back (cone of confusion).</p>
+done using the full dataset. Interestingly, we had to start with a high learning rate because the model would start in a local minimum. By initialising the weights with
+with small random numbers, the initial prediction for any audio single would be a small random number (around 0 deg). This is a good starting point, but learning to predict
++90 or -90 deg, depending on wether the sound in on the left or right is the global minima. This is because the model cannot differentiate between front and back (cone of confusion).</p>
 <p><strong>Training the CNN with Audio Data</strong></p>
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
     <iframe src="//www.youtube.com/embed/F0cH7pZOYvQ" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
 </div><div class="line-block">
 <div class="line"><br /></div>
 </div>
+<div class="section" id="loss-function">
+<h3>Loss Function<a class="headerlink" href="#loss-function" title="Permalink to this headline">¶</a></h3>
+<p>Care had to be given to how we penalised the CNN’s predictions vs the actual heading. Utilising a euclidean distance metric, does not correctly measure the difference between angles. The “straight line”
+distance between pi and -pi is 2 pi – the angular difference is 0. Instead we implemented a function to calculate the smallest angle between two headings:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">abs_radial_loss</span><span class="p">(</span><span class="n">h</span><span class="p">,</span><span class="n">y</span><span class="p">):</span>
+    <span class="sd">&quot;&quot;&quot;&quot; Calculates difference angular difference between pred - h and label - y&quot;&quot;&quot;</span><span class="s2">&quot;</span>
+    <span class="k">global</span> <span class="n">batch_size</span>
+
+    <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">h</span><span class="o">.</span><span class="n">sub</span><span class="p">(</span><span class="n">y</span><span class="p">))</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">pi</span> <span class="o">-</span> <span class="n">x</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">abs</span><span class="p">(</span><span class="n">x</span><span class="p">)</span> <span class="c1"># must be positive</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">torch</span><span class="o">.</span><span class="n">sum</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>
+    <span class="n">x</span> <span class="o">=</span> <span class="n">x</span><span class="o">/</span><span class="n">batch_size</span>
+
+    <span class="k">return</span> <span class="n">x</span>
+</pre></div>
+</div>
+</div>
 </div>
 <div class="section" id="improvements">
 <h2>Improvements<a class="headerlink" href="#improvements" title="Permalink to this headline">¶</a></h2>
-<p>We had a number of improvements to improve our audio localisation algorithm’s performance.</p>
+<p>We made a number of improvements to improve our audio localisation algorithm’s performance.</p>
 <p>1. We created a data set using a pure sinusoid at 1.6 kHz with background noise. While this would make it impossible to detect direction dependent features, it would be simpler to for the algorithm to
 extract ITD and ILD. The background noise would also make the prediction more robust in real settings.</p>
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
@@ -473,11 +496,54 @@ integrate predictions over time to account for head movement.</p>
 </div><div class="line-block">
 <div class="line"><br /></div>
 </div>
-<p>We model the sound source as a random particle that experiences a small gaussian drift each time step. The prediction is also modelled using a gaussian with variance 180 deg, to
-reflect the fact the head cannot differentiate front from back.</p>
-<p>Find relevant code in file <a class="reference external" href="https://github.com/zacharyyamaoka/DE3-Audio/blob/master/algo/filter.py">filter.py</a></p>
-<p>Now representing our prediction as a belief between 0 and 2 pi, we felt it would be more accurate to change our display from the single slice showed in the first installation.
-For the Open House, a MaxSP patch was created which wrapped belief distribution around a circle.</p>
+<p>We model the sound source as a random particle that experiences a small gaussian drift each time step:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">motion_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span><span class="n">dt</span><span class="o">=</span><span class="mf">0.1</span><span class="p">):</span>
+    <span class="c1">#assume randomly left or right motion.....</span>
+    <span class="n">norm</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">new_bel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+
+    <span class="n">drift_constant</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">drift</span> <span class="o">*</span> <span class="n">dt</span> <span class="c1">#function of dt and drift rate</span>
+
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">):</span>
+        <span class="n">new_p</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="n">theta</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bin_ind_2_theta</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">):</span>
+            <span class="n">theta_j</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bin_ind_2_theta</span><span class="p">(</span><span class="n">j</span><span class="p">)</span>
+            <span class="n">d</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">angle_delta</span><span class="p">(</span><span class="n">theta</span><span class="p">,</span><span class="n">theta_j</span><span class="p">)</span>
+
+            <span class="n">mul</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">exp</span><span class="p">(</span><span class="o">-</span><span class="n">d</span><span class="o">/</span><span class="p">(</span><span class="mi">2</span><span class="o">*</span><span class="n">drift_constant</span><span class="p">))</span>
+            <span class="n">new_p</span> <span class="o">+=</span> <span class="n">mul</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">bel</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="c1">#integrate belief from all theta</span>
+
+        <span class="n">new_bel</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_p</span>
+        <span class="n">norm</span> <span class="o">+=</span> <span class="n">new_p</span>
+    <span class="n">new_bel</span> <span class="o">/=</span> <span class="n">norm</span>
+    <span class="bp">self</span><span class="o">.</span><span class="n">bel</span> <span class="o">=</span> <span class="n">new_bel</span>
+</pre></div>
+</div>
+<p>The prediction is also modelled using a gaussian with a variance of 180 degrees, to reflect the fact the head cannot differentiate front from back:</p>
+<div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">sensor_update</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">theta_mu</span><span class="p">,</span> <span class="n">var</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">pi</span><span class="p">):</span> <span class="c1">#update with sensor reading and accuracy</span>
+
+      <span class="n">new_bel</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">)</span>
+      <span class="n">total_p</span> <span class="o">=</span> <span class="mi">0</span>
+
+      <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">np</span><span class="o">.</span><span class="n">arange</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">n</span><span class="p">):</span> <span class="c1">#for each bin update with likelihood of measurement</span>
+          <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">bin_ind_2_theta</span><span class="p">(</span><span class="n">i</span><span class="p">)</span> <span class="c1">#find the center of the bin</span>
+
+          <span class="n">likelihood</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">eval_gaussian</span><span class="p">(</span><span class="n">x</span><span class="p">,</span><span class="n">theta_mu</span><span class="p">,</span><span class="n">var</span><span class="p">)</span>
+
+          <span class="n">new_p</span> <span class="o">=</span> <span class="n">likelihood</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">bel</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+          <span class="n">new_bel</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">new_p</span>
+          <span class="n">total_p</span> <span class="o">+=</span> <span class="n">new_p</span>
+
+      <span class="n">new_bel</span> <span class="o">/=</span> <span class="n">total_p</span> <span class="c1">#normalize afterwards</span>
+
+      <span class="bp">self</span><span class="o">.</span><span class="n">bel</span> <span class="o">=</span> <span class="n">new_bel</span> <span class="c1">#replace old belief</span>
+</pre></div>
+</div>
+<p>Find full code in file <a class="reference external" href="https://github.com/zacharyyamaoka/DE3-Audio/blob/master/algo/filter.py">filter.py</a></p>
+<p>Now representing our prediction as a belief between 0 and 2 pi, we felt it would be more suitable to change our graphic display. At the first installation, we used a single slice of a circle, pointing in the
+direction of our prediction. For the Open House, a MaxSP patch was created which wrapped the belief distribution around a circle. The highest point in the histogram represented the heading prediction with
+the greatest probability.</p>
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
     <iframe src="//www.youtube.com/embed/Itsho3N23gU" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
 </div><div class="line-block">
