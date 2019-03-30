@@ -1,4 +1,4 @@
-capacityProject Report
+Project Report
 ========================
 
 *“The music is not in the notes, but in the silence between.”*
