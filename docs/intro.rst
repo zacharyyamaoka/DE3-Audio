@@ -509,8 +509,8 @@ Final Outcome
 Future Development
 -------------------
 
-To improve algorithm performance we would increase model capacity and data set size. At large enough scale, as seen in [5], such modifications can lead to
-better then human results. That said, there is certainly scope for improving the underlying algorithms used.
+To improve algorithm performance one could increase model capacity and data set size. At large scales, as seen in [5], networks have surpassed human performance.
+That said, we also feel that the underlying algorithms will have to evolve as well.
 
 Given improved performance, we foresee many potential applications of the work here in sensing and robotics.
 
@@ -518,8 +518,8 @@ Given improved performance, we foresee many potential applications of the work h
 * 3D mapping of environments
 * Localisation of objects behind walls, and other sensor "blind spots"
 
-During the Open House we had a conversation with girl who deaf in her left ear. Unable to currently localise sounds,
-see was highly interested in the applicability of this technology for hearing aids.
+During the Open House we had a conversation with a girl who deaf in her left ear. Unable to currently localise sounds,
+she was highly interested in the applicability of this technology for hearing aids.
 
 References
 -----------------
