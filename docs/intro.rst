@@ -1,4 +1,4 @@
-Project Report
+capacityProject Report
 ========================
 
 *“The music is not in the notes, but in the silence between.”*
@@ -506,6 +506,21 @@ Final Outcome
 |
 
 
+Future Development
+-------------------
+
+To improve algorithm performance we would increase model capacity and data set size. At large enough scale, as seen in [5], such modifications can lead to
+better then human results. That said, there is certainly scope for improving the underlying algorithms used.
+
+Given improved performance, we foresee many potential applications of the work here in sensing and robotics.
+
+* Help cyclists detect cars during morning commutes
+* 3D mapping of environments
+* Localisation of objects behind walls, and other sensor "blind spots"
+
+During the Open House we had a conversation with girl who deaf in her left ear. Unable to currently localise sounds,
+see was highly interested in the applicability of this technology for hearing aids.
+
 References
 -----------------
 
@@ -522,5 +537,8 @@ Plos One, Vol:14, Pages:e0211899-e0211899
 ResearchGate, 8 Aug. 2016, www.researchgate.net/post/What_is_the_maximum_walking_acceleration_deceleration_over_a_very_short_time_period_eg_002_01_05_sec.
 
 [4] Cohen, Michael. (2010). Under-explored dimensions in spatial sound. 10.1145/1900179.1900199.
+
+[5] Radford, A., Wu, J., Child, R., Luan, D., Amodei, D. & Sutskever, I. (2018). Language Models are Unsupervised Multitask Learners. , .
+
 
 ´
