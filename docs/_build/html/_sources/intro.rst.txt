@@ -181,8 +181,8 @@ Real Data Generation
 *********************
 
 The best data is data taken from the actually test distribution. To generate this dataset, we set up the dummy head and projector in the same room and configuration as it would shown on the demo day.
-The program would then pick a heading direction and display it on the floor. In the background a Python script ran that captured a sound recording every 30s. Essentially: the computer would tell the person where to stand, the person
-would move to that location while making sound, then the computer would capture a sound recording.
+The program would then pick a heading direction and display it on the floor for the person to follow. In the background a Python script ran that captured a sound recording every 30s. Essentially: the computer would tell the person where to stand, the person
+would move to that location while making sound, and the computer would capture a sound recording.
 
 **Heading Display**
 
@@ -204,7 +204,7 @@ would move to that location while making sound, then the computer would capture 
 
 |
 
-The great advantage in this approach was that data contained features specific to the dummy head we would use in the installation. ITD, IDL and especially the HRTF are greatly affected by the shape of the head,
+The great advantage in this approach was that the data contained features specific to the dummy head we would use in the installation. ITD, IDL and especially the HRTF are greatly affected by the shape of the head,
 body and the ears. The most realistic dataset we could have generated in 3D Tune-In would have utilised the publicly available Kemar HRTF and the real Kemar in the installation.
 Instead we generated a fair amount of synthetic data using the incorrect HRTF, and then fine tuned our model using a large amount of real data recorded on the actually head. Such an approach also
 allowed us the capture room specific reverb features.
@@ -224,7 +224,7 @@ the toolkit.
 For real data, we initially also used 44100 Hz and 16 bit depth. From testing, we visually confirmed that level resolution was sufficiently fine to determine ILD, but it was clear ITD features would improve if we increased sampling frequency.
 For sources close to the listener (near-field whisper), level differences are pronounced as the sound level decreases by 6 dB for every doubling of distance. The maximum time delay however, at 44100 Hz, would be just 26 samples.
 Thus, also conscious of memory space and realtime requirements, we opted for a 96000 Hz sampling rate. This simply required changing a few parameters in our code and adjusting the sampling frequency on the MOTU Ultralight we
-where using to interface with the DPA lapel mics.
+were using to interface with the DPA lapel mics.
 
 **Audio Clips - 480 samples at 96000 Hz**
 
@@ -296,7 +296,7 @@ Convolutional Neural Network
 Once the data had been collected, the CNN could be trained. First we over-fit on a small amount of data to validate the model. Then training was
 done using the full dataset. Interestingly, we had to start with a high learning rate because the model started in a local minimum. By initialising the weights with
 with small random numbers, the initial prediction for any audio single would be a small random number (around 0 deg). Predicting straight ahead is a good starting point, but learning to always predict either
-+90 or -90 deg, depending on wether the sound source location, is the global minima. This is because the model cannot differentiate between front and back (cone of confusion).
++90 or -90 deg, depending on the sound source location, is the global minima. This is because the model cannot differentiate between front and back (cone of confusion).
 
 **Training the CNN with Audio Data**
 
@@ -312,7 +312,7 @@ Loss Function
 ****************
 
 Care had to be given to how we penalised the CNN's predictions vs the actual heading. Utilising a euclidean distance metric, does not correctly measure the difference between angles. The straight line
-distance between pi and -pi is two pi, but the angular difference is 0. Instead we implemented a function to calculate the smallest angle between two headings::
+distance between 180 and -180 is 360 degrees, but the angular difference is 0. Instead we implemented a function to calculate the smallest angle between two headings::
 
   def abs_radial_loss(h,y):
       """" Calculates difference angular difference between pred - h and label - y""""

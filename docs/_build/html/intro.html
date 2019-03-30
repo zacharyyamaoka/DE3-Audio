@@ -317,8 +317,8 @@ speeds and accelerations similar to the average human [3].</p>
 <div class="section" id="real-data-generation">
 <h3>Real Data Generation<a class="headerlink" href="#real-data-generation" title="Permalink to this headline">¶</a></h3>
 <p>The best data is data taken from the actually test distribution. To generate this dataset, we set up the dummy head and projector in the same room and configuration as it would shown on the demo day.
-The program would then pick a heading direction and display it on the floor. In the background a Python script ran that captured a sound recording every 30s. Essentially: the computer would tell the person where to stand, the person
-would move to that location while making sound, then the computer would capture a sound recording.</p>
+The program would then pick a heading direction and display it on the floor for the person to follow. In the background a Python script ran that captured a sound recording every 30s. Essentially: the computer would tell the person where to stand, the person
+would move to that location while making sound, and the computer would capture a sound recording.</p>
 <p><strong>Heading Display</strong></p>
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
     <iframe src="//www.youtube.com/embed/8DLFwBuzAxI" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
@@ -331,7 +331,7 @@ would move to that location while making sound, then the computer would capture 
 </div><div class="line-block">
 <div class="line"><br /></div>
 </div>
-<p>The great advantage in this approach was that data contained features specific to the dummy head we would use in the installation. ITD, IDL and especially the HRTF are greatly affected by the shape of the head,
+<p>The great advantage in this approach was that the data contained features specific to the dummy head we would use in the installation. ITD, IDL and especially the HRTF are greatly affected by the shape of the head,
 body and the ears. The most realistic dataset we could have generated in 3D Tune-In would have utilised the publicly available Kemar HRTF and the real Kemar in the installation.
 Instead we generated a fair amount of synthetic data using the incorrect HRTF, and then fine tuned our model using a large amount of real data recorded on the actually head. Such an approach also
 allowed us the capture room specific reverb features.</p>
@@ -347,7 +347,7 @@ the toolkit.</p>
 <p>For real data, we initially also used 44100 Hz and 16 bit depth. From testing, we visually confirmed that level resolution was sufficiently fine to determine ILD, but it was clear ITD features would improve if we increased sampling frequency.
 For sources close to the listener (near-field whisper), level differences are pronounced as the sound level decreases by 6 dB for every doubling of distance. The maximum time delay however, at 44100 Hz, would be just 26 samples.
 Thus, also conscious of memory space and realtime requirements, we opted for a 96000 Hz sampling rate. This simply required changing a few parameters in our code and adjusting the sampling frequency on the MOTU Ultralight we
-where using to interface with the DPA lapel mics.</p>
+were using to interface with the DPA lapel mics.</p>
 <p><strong>Audio Clips - 480 samples at 96000 Hz</strong></p>
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
     <iframe src="//www.youtube.com/embed/o-H32zXB1Ms" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
@@ -398,7 +398,7 @@ on a simpler wave form. First clapping was tried, we hopped the algorithm would 
 <p>Once the data had been collected, the CNN could be trained. First we over-fit on a small amount of data to validate the model. Then training was
 done using the full dataset. Interestingly, we had to start with a high learning rate because the model started in a local minimum. By initialising the weights with
 with small random numbers, the initial prediction for any audio single would be a small random number (around 0 deg). Predicting straight ahead is a good starting point, but learning to always predict either
-+90 or -90 deg, depending on wether the sound source location, is the global minima. This is because the model cannot differentiate between front and back (cone of confusion).</p>
++90 or -90 deg, depending on the sound source location, is the global minima. This is because the model cannot differentiate between front and back (cone of confusion).</p>
 <p><strong>Training the CNN with Audio Data</strong></p>
 <div style="position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; max-width: 100%; height: auto;">
     <iframe src="//www.youtube.com/embed/F0cH7pZOYvQ" frameborder="0" allowfullscreen style="position: absolute; top: 0; left: 0; width: 100%; height: 100%;"></iframe>
@@ -408,7 +408,7 @@ with small random numbers, the initial prediction for any audio single would be 
 <div class="section" id="loss-function">
 <h3>Loss Function<a class="headerlink" href="#loss-function" title="Permalink to this headline">¶</a></h3>
 <p>Care had to be given to how we penalised the CNN’s predictions vs the actual heading. Utilising a euclidean distance metric, does not correctly measure the difference between angles. The straight line
-distance between pi and -pi is two pi, but the angular difference is 0. Instead we implemented a function to calculate the smallest angle between two headings:</p>
+distance between 180 and -180 is 360 degrees, but the angular difference is 0. Instead we implemented a function to calculate the smallest angle between two headings:</p>
 <div class="highlight-default notranslate"><div class="highlight"><pre><span></span><span class="k">def</span> <span class="nf">abs_radial_loss</span><span class="p">(</span><span class="n">h</span><span class="p">,</span><span class="n">y</span><span class="p">):</span>
     <span class="sd">&quot;&quot;&quot;&quot; Calculates difference angular difference between pred - h and label - y&quot;&quot;&quot;</span><span class="s2">&quot;</span>
     <span class="k">global</span> <span class="n">batch_size</span>
