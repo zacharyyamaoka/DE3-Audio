@@ -359,7 +359,7 @@ extract ITD and ILD. The background noise would also make the prediction more ro
 
 While this removed distance information, it gave improved robustness to level differences and background noise (like that found in the installation)
 
-3. We changed the localisation task from regression to classification problem. Previously our CNN was trained to predict source heading on a continuous range between 0 and 2 pi. Now it would simply predict left or
+3. We changed the localisation task from regression to classification problem. Previously our CNN was trained to predict source heading on a continuous range between 0 and 360 degrees. Now it would simply predict left or
 right.
 
 .. raw:: html
