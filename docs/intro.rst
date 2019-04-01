@@ -86,12 +86,10 @@ Team coordination was facilitated by: Messenger, `Github`_, Trello
 Data Generation
 -------------------------
 
-The field of *machine listening* is hot. Previous work has utilised large microphone arrays (5+) with custom algorithms and hand picked features [1].
-Recent advances in machine learning, however, have made it possible to learn extremely complex functions from data.
-These advances are being applied to reach state of the art performance in sound localisation [1].
-
-In line with previous work, our team aimed to train a convolutional neural network (CNN) to predict sound location based on time series audio data. We were most
-interested, however, in using a novel method to generate training data, and in utilising only two microphones (mimicking the human system) as suppose to a large microphone array.
+Previous work in machine listening has utilised large microphone arrays (5+) with custom algorithms and hand picked features [1].
+Recent advances in machine learning, however, have made it possible to learn extremely complex functions from data. In line with previous work [1],
+our team aimed to train a convolutional neural network (CNN) to predict sound location based on time series audio data. We were most
+interested, however, in utilising only two microphones (mimicking the human system) as suppose to a large microphone array.
 
 3D Tune-In
 ************
@@ -307,26 +305,6 @@ with small random numbers, the initial prediction for any audio single would be 
     </div>
 
 |
-
-Loss Function
-****************
-
-Care had to be given to how we penalised the CNN's predictions vs the actual heading. Utilising a euclidean distance metric, does not correctly measure the difference between angles. The straight line
-distance between 180 and -180 is 360 degrees, but the angular difference is 0. Instead we implemented a function to calculate the smallest angle between two headings::
-
-  def abs_radial_loss(h,y):
-      """" Calculates difference angular difference between pred - h and label - y""""
-      global batch_size
-
-      x = torch.abs(h.sub(y))
-      x = torch.abs(x - np.pi)
-      x = np.pi - x
-      x = torch.abs(x) # must be positive
-      x = torch.sum(x)
-      x = x/batch_size
-
-      return x
-
 
 Improvements
 -----------------------------
